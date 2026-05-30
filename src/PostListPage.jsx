@@ -1,11 +1,29 @@
 import posts  from './data/posts'
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import {Link, useNavigate } from 'react-router-dom'
 import './PostListPage.css'
+import {getPosts} from './api/postApi'
 
 const PostListPage = () => {
-    const [postList, setPostList] = useState(posts)
+    const [postList, setPostList] = useState([])
     const navigate = useNavigate()
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const data = await getPosts()
+
+                console.log('게시글 목록 조회 성공:', data)
+                
+                setPostList(data)
+            } catch (error) {
+                console.error('게시글 목록 조회 실패:', error.response?.data?.message)
+                alert('게시글 목록 조회에 실패했습니다. 다시 시도해주세요.')
+            }
+        }
+
+        fetchPosts()
+    }, [])
 
     return (
         <div className='post-list-page'>
@@ -17,8 +35,8 @@ const PostListPage = () => {
             </div>
             <div className='post-list'>
                 {postList.map( post => (
-                    <div className='post-item' key={post.id}>
-                        <Link className='post-title-link' to={`/posts/${post.id}`}>
+                    <div className='post-item' key={post.postId}>
+                        <Link className='post-title-link' to={`/posts/${post.postId}`}>
                             {post.title}
                         </Link>
                         {/* <p className='post-content'>{post.content}</p> */}

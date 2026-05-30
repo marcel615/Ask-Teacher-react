@@ -3,7 +3,6 @@ import posts from './data/posts'
 import './SignupPage.css'
 
 function SignupPage() {
-
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 

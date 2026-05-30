@@ -6,7 +6,7 @@ import './PostEditPage.css'
 
 function PostEditPage() {
     const { postId } = useParams()
-    const post = posts[postId]
+    const post = posts.find(post => post.id === Number(postId))
     const navigate = useNavigate()
 
     const [title, setTitle] = useState(post.title)
