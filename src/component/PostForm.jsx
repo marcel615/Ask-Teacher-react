@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import './PostForm.css'
 
 function PostForm({
     title, 
@@ -10,22 +11,20 @@ function PostForm({
 }) {
 
     return (
-        <div>
-            <form onSubmit={onSubmit}>
-                <label>제목</label>
-                <input 
-                    type="text"
-                    value={title}
-                    onChange={e => setTitle(e.target.value)}
-                />
-                <label>내용</label>
-                <textarea 
-                    value={content}
-                    onChange={e => setContent(e.target.value)}
-                />
-                <button type="submit">{submitText}</button>
-            </form>
-        </div>
+        <form className="post-form" onSubmit={onSubmit}>
+            <label className="post-form-label">제목</label>
+            <input className="post-form-input"
+                type="text"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+            />
+            <label className="post-form-label">내용</label>
+            <textarea className="post-form-textarea"
+                value={content}
+                onChange={e => setContent(e.target.value)}
+            />
+            <button className="post-form-button" type="submit">{submitText}</button>
+        </form>
     )
 }
 

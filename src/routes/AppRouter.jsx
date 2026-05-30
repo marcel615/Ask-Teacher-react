@@ -13,8 +13,8 @@ function AppRouter() {
             <Route path="/" element={<HomePage />} />
             <Route path="/posts" element={<PostListPage />} />
             <Route path="/posts/create" element={<PostCreatePage />} />
-            <Route path="/posts/:id/edit" element={<PostEditPage />} />
-            <Route path="/posts/:id" element={<PostDetailPage />} />
+            <Route path="/posts/:postId/edit" element={<PostEditPage />} />
+            <Route path="/posts/:postId" element={<PostDetailPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
         </Routes>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import posts from './data/posts'
+import './SignupPage.css'
 
 function SignupPage() {
 
@@ -9,35 +10,27 @@ function SignupPage() {
     function handleSubmit(e) {
         e.preventDefault()
         console.log({ email, password })
-
-        posts.push({
-            id: posts.length + 1,
-            title: email,
-            content: password
-        })
     }
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label>이메일</label>
-                <input 
+        <div className="signup-page">
+            <form className="signup-form" onSubmit={handleSubmit}>
+                <label className="signup-form-label">이메일</label>
+                <input className="signup-form-input"
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                 />
-                <label>비밀번호</label>
-                <input 
+                <label className="signup-form-label">비밀번호</label>
+                <input className="signup-form-input"
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                 />
-                <button type="submit">회원가입</button>
+                <button className="signup-form-button" type="submit">회원가입</button>
             </form>
         </div>
     )
-
-
 }
 
 export default SignupPage

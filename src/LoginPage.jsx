@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import './LoginPage.css'
 
 function LoginPage() {
     const [email, setEmail] = useState('')
@@ -10,21 +11,22 @@ function LoginPage() {
     }
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-                <label>이메일</label>
-                <input 
+        <div className="login-page">
+            <form className="login-form" onSubmit={handleSubmit}>
+                <label className="login-form-label">이메일</label>
+                <input className="login-form-input"
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                 />
-                <label>비밀번호</label>
+                <label className="login-form-label">비밀번호</label>
                 <input 
+                    className="login-form-input"
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                 />
-                <button type="submit">로그인</button>
+                <button className="login-form-button" type="submit">로그인</button>
             </form>
         </div>
     )
