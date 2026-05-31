@@ -1,20 +1,39 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import PostForm from './component/PostForm'
 import './PostCreatePage.css'
 import { createPost } from './api/postApi'
+import { getCategories } from './api/postCategoryApi'
 import { validateForm } from './utils/postValidation'
 
 function PostCreatePage() {
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
     const [error, setError] = useState(null)
+    const [categoryId, setCategoryId] = useState('')
+    const [categoryList, setCategoryList] = useState([])
     const navigate = useNavigate()
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const data = await getCategories()
+
+                setCategoryList(data)
+            } catch (error) {
+                console.error('카테고리 목록 조회 실패:', error.response?.data?.message)
+
+                setError(error.response?.data?.message)
+            }
+        }
+
+        fetchCategories()
+    }, [])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        const validationMessage = validateForm(title, content)
+        const validationMessage = validateForm(categoryId, title, content)
         if (validationMessage) {
             alert(validationMessage)
             return
@@ -22,7 +41,7 @@ function PostCreatePage() {
 
         const postData = {
             userId: 1,
-            categoryId: 1,
+            categoryId: Number(categoryId),
             title: title.trim(),
             content: content.trim()
         }
@@ -49,6 +68,9 @@ function PostCreatePage() {
                 </p>
             )}
             <PostForm 
+                categoryId={categoryId}
+                setCategoryId={setCategoryId}
+                categoryList={categoryList}
                 title={title}
                 setTitle={setTitle}
                 content={content}

@@ -1,5 +1,9 @@
 
-    export const validateForm = (title, content) => {
+    export const validateForm = (categoryId, title, content) => {
+        if (!categoryId) {
+            return '카테고리를 선택해주세요.'
+        }
+        
         if (title === '') {
             return '제목은 필수입니다.'
         }

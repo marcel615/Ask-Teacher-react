@@ -10,6 +10,7 @@
     color: #333;
 }
 
+.post-form-select,
 .post-form-input,
 .post-form-textarea {
     padding: 12px;
@@ -18,12 +19,18 @@
     font-size: 14px;
     outline: none;
 }
+
+.post-form-select {
+    background-color: #fff;
+}
+
 .post-form-textarea {
     min-height: 200px;
     resize: vertical;
     line-height: 1.5;
 }
 
+.post-form-select:focus,
 .post-form-input:focus,
 .post-form-textarea:focus {
     border-color: #222;

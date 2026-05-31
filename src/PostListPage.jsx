@@ -12,8 +12,6 @@ const PostListPage = () => {
         const fetchPosts = async () => {
             try {
                 const data = await getPosts()
-
-                console.log('게시글 목록 조회 성공:', data)
                 
                 setPostList(data)
             } catch (error) {
