@@ -3,20 +3,28 @@ import { useNavigate } from 'react-router-dom'
 import PostForm from './component/PostForm'
 import './PostCreatePage.css'
 import { createPost } from './api/postApi'
+import { validateForm } from './utils/postValidation'
 
 function PostCreatePage() {
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
+    const [error, setError] = useState(null)
     const navigate = useNavigate()
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+
+        const validationMessage = validateForm(title, content)
+        if (validationMessage) {
+            alert(validationMessage)
+            return
+        }
 
         const postData = {
             userId: 1,
             categoryId: 1,
-            title,
-            content
+            title: title.trim(),
+            content: content.trim()
         }
         try {
             const data = await createPost(postData)
@@ -27,13 +35,19 @@ function PostCreatePage() {
             navigate('/posts')
         } catch (error) {
             console.error('게시글 작성 실패:', error.response?.data?.message)
-            alert('게시글 작성에 실패했습니다. 다시 시도해주세요.')
+
+            setError(error.response?.data?.message)
         }
     }
 
     return (
         <div className="post-create-page">
             <h3 className="post-create-title">Post Create Page</h3>
+            {error && (
+                <p className="error-message">
+                    게시글 작성 중 오류가 발생했습니다: {error}
+                </p>
+            )}
             <PostForm 
                 title={title}
                 setTitle={setTitle}

@@ -1,4 +1,3 @@
-import posts  from './data/posts'
 import {useEffect, useState} from 'react'
 import {Link, useNavigate } from 'react-router-dom'
 import './PostListPage.css'
@@ -6,6 +5,7 @@ import {getPosts} from './api/postApi'
 
 const PostListPage = () => {
     const [postList, setPostList] = useState([])
+    const [error, setError] = useState(null)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -18,15 +18,31 @@ const PostListPage = () => {
                 setPostList(data)
             } catch (error) {
                 console.error('게시글 목록 조회 실패:', error.response?.data?.message)
-                alert('게시글 목록 조회에 실패했습니다. 다시 시도해주세요.')
+
+                setError(error.response?.data?.message)
             }
         }
 
         fetchPosts()
     }, [])
 
+    if (error) {
+        return (
+            <div className='post-list-page'>
+                <p className='error-message'>
+                    게시글 목록을 불러오는 중 오류가 발생했습니다: {error}
+                </p>
+            </div>
+        )
+    }
+
     return (
         <div className='post-list-page'>
+            {error && (
+                <p className="error-message">
+                    게시글 목록을 불러오는 중 오류가 발생했습니다: {error}
+                </p>
+            )}
             <div className='post-list-header'>
                 <h3 className='post-list-title'>Post List</h3>
                 <button className='post-list-create-button' onClick={() => navigate('/posts/create')}>
