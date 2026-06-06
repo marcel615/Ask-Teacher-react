@@ -5,6 +5,7 @@ import {getPosts} from './api/postApi'
 
 const PostListPage = () => {
     const [postList, setPostList] = useState([])
+    const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
     const navigate = useNavigate()
 
@@ -18,11 +19,17 @@ const PostListPage = () => {
                 console.error('게시글 목록 조회 실패:', error.response?.data?.message)
 
                 setError(error.response?.data?.message)
+            } finally {
+                setIsLoading(false)
             }
         }
 
         fetchPosts()
     }, [])
+
+    if (isLoading) {
+        return <div className='post-list-page'>로딩 중...</div>
+    }
 
     if (error) {
         return (
@@ -36,11 +43,6 @@ const PostListPage = () => {
 
     return (
         <div className='post-list-page'>
-            {error && (
-                <p className="error-message">
-                    게시글 목록을 불러오는 중 오류가 발생했습니다: {error}
-                </p>
-            )}
             <div className='post-list-header'>
                 <h3 className='post-list-title'>Post List</h3>
                 <button className='post-list-create-button' onClick={() => navigate('/posts/create')}>

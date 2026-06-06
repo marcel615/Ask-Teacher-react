@@ -14,11 +14,11 @@ description: GitHub Issue 기반 React 프론트엔드 개발 워크플로우가
 ## 핵심 원칙
 
 - Issue는 GitHub의 작업 요청 원본이다.
-- 구현 기준은 `docs/ai/current-task.md`다.
-- 프론트 요구사항은 `docs/ai/requirements.md`에 둔다.
-- 프론트 API 사용 기준은 `docs/ai/api-usage.md`에 둔다.
-- 리뷰 기준은 `docs/ai/review-checklist.md`에 둔다.
-- devlog는 `docs/ai/devlog/YYYY-MM.md`에 월별로 누적한다.
+- 구현 기준은 `docs/current-task.md`다.
+- 프론트 요구사항은 `docs/requirements.md`에 둔다.
+- 프론트 API 사용 기준은 `docs/api-usage.md`에 둔다.
+- 리뷰 기준은 `docs/review-checklist.md`에 둔다.
+- devlog는 `docs/devlog/YYYY-MM.md`에 월별로 누적한다.
 - 백엔드 API 명세 원본은 백엔드 프로젝트 문서를 기준으로 한다.
 - 프론트에서는 API 사용 위치, API 함수명, 응답 처리 기준만 관리한다.
 - 구현은 `develop`에서 생성한 `feature/*` 브랜치에서 진행한다.

@@ -2,7 +2,7 @@
 
 ## 작업 범위
 
-- [ ] `docs/ai/current-task.md` 범위 안에서 작업했는가?
+- [ ] `docs/current-task.md` 범위 안에서 작업했는가?
 - [ ] 불필요한 변경이 없는가?
 - [ ] 작업 브랜치와 PR 방향이 올바른가?
 - [ ] 이번 PR에서 하지 않을 일까지 건드리지 않았는가?
@@ -19,7 +19,7 @@
 
 ## API 연동
 
-- [ ] API 사용이 `docs/ai/api-usage.md`와 일치하는가?
+- [ ] API 사용이 `docs/api-usage.md`와 일치하는가?
 - [ ] API 함수가 적절한 파일에 분리되어 있는가?
 - [ ] Method / URL / Request Body가 백엔드 명세와 일치하는가?
 - [ ] 성공 응답 반환 기준이 일관적인가?

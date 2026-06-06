@@ -9,6 +9,7 @@ import { validateForm } from './utils/postValidation'
 function PostCreatePage() {
     const [title, setTitle] = useState('')
     const [content, setContent] = useState('')
+    const [isLoading, setIsLoading] = useState(true)
     const [error, setError] = useState(null)
     const [categoryId, setCategoryId] = useState('')
     const [categoryList, setCategoryList] = useState([])
@@ -24,11 +25,20 @@ function PostCreatePage() {
                 console.error('카테고리 목록 조회 실패:', error.response?.data?.message)
 
                 setError(error.response?.data?.message)
+            } finally {
+                setIsLoading(false)
             }
         }
 
         fetchCategories()
     }, [])
+
+    if (isLoading) {
+        return <div className='post-create-page'>로딩 중...</div>
+    }
+    if (error) {
+        return <div className='post-create-page'>오류가 발생했습니다. {error}</div>
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault()

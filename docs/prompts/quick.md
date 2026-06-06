@@ -186,10 +186,8 @@ PR 준비하자.
 feature/* → develop 방향으로 PR 본문과 커밋 메시지를 제안해줘.
 
 PR 본문은 `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md` 템플릿 형식을 기준으로 작성해줘.
-템플릿 항목을 임의로 새로 만들지 말고, 기존 PR 템플릿의 섹션을 유지해줘.
 
-테스트 결과와 체크리스트는 실제로 확인한 항목만 체크하고,
-확인하지 못한 항목은 체크하지 말고 사유를 적어줘.
+테스트 결과와 체크리스트는 실제로 확인한 항목만 체크해줘.
 
 커밋 메시지는 Conventional Commit 형식으로 제안해줘.
 
@@ -215,7 +213,7 @@ PR 생성 후 PR URL을 알려줘.
 ## 7. PR 리뷰
 
 ```text
-docs/ai/review-checklist.md 기준으로 현재 PR을 리뷰해줘.
+docs/review-checklist.md 기준으로 현재 PR을 리뷰해줘.
 
 파일은 수정하지 말고 아래 형식으로 나눠줘.
 
@@ -231,7 +229,7 @@ docs/ai/review-checklist.md 기준으로 현재 PR을 리뷰해줘.
 ## 8. 리뷰 반영 판단
 
 ```text
-Architect 리뷰를 검토해줘.
+PR에 올라온 Architect 리뷰를 검토해줘.
 
 각 항목을 아래 기준으로 분류해줘.
 
