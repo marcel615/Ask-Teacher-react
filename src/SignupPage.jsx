@@ -14,11 +14,14 @@ function SignupPage() {
     const [error, setError] = useState('')
 
     function validateForm() {
-        if (!email.trim()) {
+        const trimmedEmail = email.trim()
+        const trimmedNickname = nickname.trim()
+
+        if (!trimmedEmail) {
             return '이메일을 입력해 주세요.'
         }
 
-        if (!emailPattern.test(email)) {
+        if (!emailPattern.test(trimmedEmail)) {
             return '올바른 이메일 형식으로 입력해 주세요.'
         }
 
@@ -30,11 +33,11 @@ function SignupPage() {
             return '비밀번호는 8자 이상 입력해 주세요.'
         }
 
-        if (!nickname.trim()) {
+        if (!trimmedNickname) {
             return '닉네임을 입력해 주세요.'
         }
 
-        if (nickname.trim().length < 2 || nickname.trim().length > 20) {
+        if (trimmedNickname.length < 2 || trimmedNickname.length > 20) {
             return '닉네임은 2자 이상 20자 이하로 입력해 주세요.'
         }
 
@@ -74,23 +77,35 @@ function SignupPage() {
     return (
         <div className="signup-page">
             <form className="signup-form" onSubmit={handleSubmit}>
-                <label className="signup-form-label">닉네임</label>
-                <input className="signup-form-input"
+                <label className="signup-form-label" htmlFor="signup-nickname">닉네임</label>
+                <input
+                    id="signup-nickname"
+                    className="signup-form-input"
                     type="text"
                     value={nickname}
                     onChange={e => setNickname(e.target.value)}
+                    required
+                    minLength={2}
+                    maxLength={20}
                 />
-                <label className="signup-form-label">이메일</label>
-                <input className="signup-form-input"
+                <label className="signup-form-label" htmlFor="signup-email">이메일</label>
+                <input
+                    id="signup-email"
+                    className="signup-form-input"
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
+                    required
                 />
-                <label className="signup-form-label">비밀번호</label>
-                <input className="signup-form-input"
+                <label className="signup-form-label" htmlFor="signup-password">비밀번호</label>
+                <input
+                    id="signup-password"
+                    className="signup-form-input"
                     type="password"
                     value={password}
                     onChange={e => setPassword(e.target.value)}
+                    required
+                    minLength={8}
                 />
                 {error && <p className="signup-form-error">{error}</p>}
                 <button
