@@ -54,6 +54,7 @@ const PostListPage = () => {
                     <div className='post-item' key={post.postId}>
                         <Link className='post-title-link' to={`/posts/${post.postId}`}>
                             {post.title}
+                            {post.newPost && <span className='post-new-badge'>new</span>}
                         </Link>
                         {/* <p className='post-content'>{post.content}</p> */}
                     </div>

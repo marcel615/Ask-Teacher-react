@@ -47,6 +47,22 @@ src/api/
 
 ---
 
+## 응답 데이터 메모
+
+### 게시글 목록 조회
+
+`GET /api/posts` 응답의 각 게시글 항목에서 프론트는 다음 필드를 사용한다.
+
+- `postId`
+- `title`
+- `writerNickname`
+- `newPost`
+- `createdAt`
+
+`newPost`가 `true`이면 게시글 목록 UI에 작은 `new` 표시를 노출한다.
+
+---
+
 ## 요청 데이터 메모
 
 ### 게시글 작성 / 수정
