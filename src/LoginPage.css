@@ -37,6 +37,14 @@
     border-color: #222;
 }
 
+.login-form-error {
+    margin: 0;
+    color: #d32f2f;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: left;
+}
+
 .login-form-button {
     margin-top: 12px;
     padding: 12px;
@@ -51,4 +59,9 @@
 
 .login-form-button:hover {
     background-color: #000;
+}
+
+.login-form-button:disabled {
+    background-color: #777;
+    cursor: not-allowed;
 }

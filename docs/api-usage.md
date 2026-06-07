@@ -98,6 +98,44 @@ src/api/
 }
 ```
 
+#### Validation
+
+| 필드 | 규칙 |
+|---|---|
+| email | 필수, 이메일 형식 |
+| password | 필수 |
+
+#### 성공 응답
+
+```json
+{
+  "status": 200,
+  "message": "로그인에 성공했습니다.",
+  "data": {
+    "userId": 1,
+    "email": "user@example.com",
+    "nickname": "springUser"
+  }
+}
+```
+
+#### Status Code
+
+| 상황 | Status |
+|---|---|
+| 성공 | 200 OK |
+| Validation 실패 | 400 Bad Request |
+| 로그인 정보 불일치 | 401 Unauthorized |
+
+#### 프론트 처리 기준
+
+- API 함수명은 `login(loginData)`로 둔다.
+- 위치는 `src/api/authApi.js`로 둔다.
+- 로그인 요청 성공 시 `response.data`를 반환한다.
+- 실패 시 `error.response?.data?.message`를 우선 사용한다.
+- Issue #4에서는 성공 응답의 사용자 정보를 저장하지 않는다.
+- Issue #4에서는 성공 시 로그인 성공 알림창만 표시한다.
+
 ---
 
 ## 에러 처리 기준
