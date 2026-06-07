@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { login } from './api/authApi'
 import './LoginPage.css'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function LoginPage() {
+    const navigate = useNavigate()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [isLoading, setIsLoading] = useState(false)
@@ -21,7 +23,7 @@ function LoginPage() {
             return '올바른 이메일 형식으로 입력해 주세요.'
         }
 
-        if (!password) {
+        if (!password.trim()) {
             return '비밀번호를 입력해 주세요.'
         }
 
@@ -41,11 +43,12 @@ function LoginPage() {
         setError('')
 
         try {
-            await login({
+            const response = await login({
                 email: email.trim(),
                 password
             })
-            alert('로그인에 성공했습니다.')
+            alert(response.message || '로그인에 성공했습니다.')
+            navigate('/posts')
         } catch (error) {
             const message =
                 error.response?.data?.message ||
@@ -58,7 +61,7 @@ function LoginPage() {
 
     return (
         <div className="login-page">
-            <form className="login-form" onSubmit={handleSubmit}>
+            <form className="login-form" onSubmit={handleSubmit} noValidate>
                 <label className="login-form-label" htmlFor="login-email">이메일</label>
                 <input
                     id="login-email"
