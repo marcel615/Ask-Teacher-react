@@ -70,6 +70,25 @@ src/api/
 }
 ```
 
+#### Validation
+
+| 필드 | 규칙 |
+|---|---|
+| email | 필수, 이메일 형식, 중복 불가 |
+| password | 필수, 8자 이상 |
+| nickname | 필수, 2자 이상 20자 이하, 중복 불가 |
+
+#### 성공 응답
+
+회원가입 API는 생성 성공 시 `201 Created`와 `ApiResponse` 구조를 반환한다.
+
+#### 실패 처리
+
+- Validation 실패: `400 Bad Request`
+- 이메일 또는 닉네임 중복: `409 Conflict`
+- 실패 시 회원가입 페이지를 유지한다.
+- 실패 시 `error` 상태를 설정하고 alert로 "회원가입 실패"를 한 번 표시한다.
+
 ### 로그인
 
 ```json
