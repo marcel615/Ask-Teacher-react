@@ -12,6 +12,16 @@
     color: #222;
 }
 
+.post-detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #555;
+}
+
 .post-detail-content {
     min-height: 200px;
     margin: 0 0 32px;

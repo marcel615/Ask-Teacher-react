@@ -11,3 +11,10 @@
     font-weight: 700;
     color: #222;
 }
+
+.post-edit-page-error {
+    margin: 0 0 16px;
+    color: #c0392b;
+    font-size: 14px;
+    font-weight: 600;
+}

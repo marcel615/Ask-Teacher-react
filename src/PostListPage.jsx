@@ -3,6 +3,14 @@ import {Link, useNavigate } from 'react-router-dom'
 import './PostListPage.css'
 import {getPosts} from './api/postApi'
 
+const formatDateTime = (dateTime) => {
+    if (!dateTime) {
+        return ''
+    }
+
+    return dateTime.replace('T', ' ').slice(0, 16)
+}
+
 const PostListPage = () => {
     const [postList, setPostList] = useState([])
     const [isLoading, setIsLoading] = useState(true)
@@ -52,6 +60,7 @@ const PostListPage = () => {
             <div className='post-list'>
                 {postList.map( post => (
                     <div className='post-item' key={post.postId}>
+                        <p className='post-item-created-at'>{formatDateTime(post.createdAt)}</p>
                         <Link className='post-title-link' to={`/posts/${post.postId}`}>
                             {post.title}
                             {post.newPost && <span className='post-new-badge'>new</span>}
