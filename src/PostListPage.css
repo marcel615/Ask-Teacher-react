@@ -41,6 +41,13 @@
     border-radius: 8px;
 }
 
+.post-item-created-at {
+    margin-bottom: 8px;
+    color: #666;
+    font-size: 13px;
+    font-weight: 600;
+}
+
 .post-title-link {
     display: inline-flex;
     align-items: center;

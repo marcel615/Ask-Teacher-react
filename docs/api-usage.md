@@ -76,6 +76,62 @@ src/api/
 }
 ```
 
+### 게시글 수정
+
+#### API 함수
+
+- 함수명: `updatePost(postId, postData)`
+- 위치: `src/api/postApi.js`
+- Method: `PATCH`
+- URL: `/api/posts/{postId}`
+- 사용 위치: `PostEditPage`
+- 반환 기준: `response.data`
+
+#### Request
+
+```json
+{
+  "userId": 1,
+  "categoryId": 1,
+  "title": "수정 게시글 제목",
+  "content": "수정 게시글 내용"
+}
+```
+
+#### Validation
+
+| 필드 | 규칙 |
+|---|---|
+| postId | 필수, 존재하는 게시글 ID |
+| userId | 필수, 존재하는 사용자 ID, 게시글 작성자 ID와 일치 |
+| categoryId | 필수, 존재하는 카테고리 ID |
+| title | 필수, 100자 이하 |
+| content | 필수, 5000자 이하 |
+
+#### Success Response
+
+```json
+{
+  "status": 200,
+  "message": "게시글 수정에 성공했습니다.",
+  "data": {
+    "postId": 1,
+    "categoryId": 1,
+    "title": "수정 게시글 제목",
+    "content": "수정 게시글 내용",
+    "updatedAt": "2026-05-12T19:30:00"
+  }
+}
+```
+
+#### 프론트 처리 기준
+
+- 수정 요청은 수정 버튼 클릭 이벤트에서만 실행한다.
+- 입력값 검증 실패 시 API 요청을 보내지 않는다.
+- 요청 중에는 `isLoading` 상태로 화면을 제어한다.
+- 실패 시 `error.response?.data?.message`를 우선 사용한다.
+- 성공 시 `/posts/{postId}` 상세 페이지로 이동한다.
+
 ### 회원가입
 
 ```json

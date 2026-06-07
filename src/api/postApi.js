@@ -17,7 +17,7 @@ export const createPost = async (postData) => {
 
 export const updatePost = async (postId, postData) => {
     const response = await api.patch(`/posts/${postId}`, postData)
-    return response.data.data
+    return response.data
 }
 
 export const deletePost = async (postId) => {

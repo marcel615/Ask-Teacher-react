@@ -1,8 +1,15 @@
 import {useParams, useNavigate} from 'react-router-dom'
-import posts from './data/posts'
 import './PostDetailPage.css'
 import { getPostById } from './api/postApi'
 import { useEffect, useState } from 'react'
+
+const formatDateTime = (dateTime) => {
+    if (!dateTime) {
+        return ''
+    }
+
+    return dateTime.replace('T', ' ').slice(0, 16)
+}
 
 function PostDetailPage() {
     const {postId} = useParams()
@@ -42,9 +49,13 @@ function PostDetailPage() {
 
     return (
         <div className='post-detail-page'>
+            <div className='post-detail-meta'>
+                <span>{post.categoryName}</span>
+                <span>{formatDateTime(post.createdAt)}</span>
+            </div>
             <h3 className='post-detail-title'>{post.title}</h3>
             <p className='post-detail-content'>{post.content}</p>
-            <button className='post-detail-edit-button' onClick={() => navigate(`/posts/${post.id}/edit`)}>수정</button>
+            <button className='post-detail-edit-button' onClick={() => navigate(`/posts/${post.postId ?? post.id ?? postId}/edit`)}>수정</button>
             {/* <button onClick={() => navigate(`/posts/${post.id}/delete`)}>삭제</button> */}
         </div>
     )
