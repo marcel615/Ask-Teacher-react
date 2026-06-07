@@ -21,6 +21,7 @@ export const updatePost = async (postId, postData) => {
 }
 
 export const deletePost = async (postId) => {
-    await api.delete(`/posts/${postId}`)
+    const response = await api.delete(`/posts/${postId}`)
+    return response.data
 }
 

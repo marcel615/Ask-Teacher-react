@@ -132,6 +132,46 @@ src/api/
 - 실패 시 `error.response?.data?.message`를 우선 사용한다.
 - 성공 시 `/posts/{postId}` 상세 페이지로 이동한다.
 
+### 게시글 삭제
+
+#### API 함수
+
+- 함수명: `deletePost(postId)`
+- 위치: `src/api/postApi.js`
+- Method: `DELETE`
+- URL: `/api/posts/{postId}`
+- 사용 위치: `PostDetailPage`
+- 반환 기준: `response.data`
+
+#### Request
+
+- Path Variable: `postId`
+
+#### Success Response
+
+```json
+{
+  "status": 200,
+  "message": "게시글 삭제에 성공했습니다."
+}
+```
+
+#### Status Code
+
+| 상황 | Status |
+|---|---|
+| 삭제 성공 | 200 OK |
+| 게시글 없음 | 404 Not Found |
+
+#### 프론트 처리 기준
+
+- 삭제 요청은 삭제 확인 알림창에서 사용자가 "네"를 선택한 경우에만 실행한다.
+- 사용자가 "아니오"를 선택하면 API 요청 없이 상세 페이지에 머문다.
+- 삭제 요청 중에는 `isLoading` 상태로 화면을 제어한다.
+- 실패 시 `error.response?.data?.message`를 우선 사용한다.
+- 서버 응답 메시지가 없으면 기본 에러 메시지를 사용한다.
+- 삭제 성공 후 `/posts` 게시글 목록 페이지로 이동한다.
+
 ### 회원가입
 
 ```json
