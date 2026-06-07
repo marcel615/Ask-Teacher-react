@@ -52,7 +52,7 @@ function PostDetailPage() {
 
             await deletePost(postId)
 
-            navigate('/posts')
+            navigate('/posts', { replace: true })
         } catch (error) {
             setDeleteError(error.response?.data?.message ?? '게시글 삭제에 실패했습니다.')
         } finally {
