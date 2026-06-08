@@ -2,114 +2,139 @@
 
 ## 연결 Issue
 
-* Issue 번호: #8
-* Issue 제목: feat(post): 게시글 수정
-* Issue URL: https://github.com/marcel615/Ask-Teacher/issues/8
+* Issue 번호: #2
+* Issue 제목: [Feature] post: 게시글 삭제 페이지
+* Issue URL: https://github.com/marcel615/Ask-Teacher-react/issues/2
 
 ## 작업명
 
-* 게시글 수정 페이지 API 연결
+* 게시글 상세 페이지 삭제 기능 구현
 
 ## 작업 배경
 
-* 사용자는 기존 게시글의 카테고리, 제목, 내용을 수정할 수 있어야 한다.
-* 게시글 수정 페이지는 URL의 `postId`를 기준으로 기존 게시글 정보를 조회한다.
-* 수정 폼에는 기존 카테고리, 제목, 내용이 초기값으로 표시되어야 한다.
-* 카테고리는 백엔드 카테고리 목록 API를 통해 select 박스로 표시한다.
-* 로그인/토큰 기반 인증 구조가 아직 정식 범위가 아니므로, MVP 단계에서는 `userId`를 임시값으로 전달한다.
-* 수정 성공 시 게시글 목록 페이지 또는 상세 페이지로 이동한다.
+* 사용자가 게시글 상세 페이지에서 게시글을 삭제할 수 있어야 한다.
+* 삭제 버튼 클릭 시 즉시 삭제하지 않고 확인 알림창을 표시한 뒤, 사용자가 "네"를 선택한 경우에만 삭제 API를 호출한다.
+* 삭제 요청 성공 후에는 게시글 목록 페이지로 이동한다.
 
 ## 참조 설계
 
-API / ERD / 요구사항 전체는 복사하지 않는다. 이번 Issue와 직접 관련된 요약과 참조만 적는다.
+API / ERD / 요구사항 전체를 복사하지 않는다. 이번 Issue와 직접 관련된 요약과 참조만 적는다.
 
 * 관련 요구사항:
-
-  * 게시글 수정
-  * 사용자는 게시글의 카테고리, 제목, 내용을 수정할 수 있다.
-  * 제목은 필수이며 100자 이하이다.
-  * 내용은 필수이며 5000자 이하이다.
-  * 제목과 내용은 공백만 입력할 수 없다.
-  * 요청 사용자 ID와 게시글 작성자 ID가 일치해야 수정할 수 있다.
+  * 게시글 삭제 기능
+  * 게시글 상세 페이지에서 삭제 버튼을 클릭할 수 있다.
+  * 삭제 버튼 클릭 시 게시글 삭제 여부를 확인하는 알림창을 표시한다.
+  * 사용자가 "네"를 선택하면 삭제 요청을 보낸다.
+  * 사용자가 "아니오"를 선택하면 삭제 요청을 보내지 않고 상세 페이지에 머문다.
+  * 삭제 요청 중에는 `isLoading` 상태로 화면을 제어한다.
+  * 삭제 실패 시 `error` 상태를 설정하고 서버 에러 메시지를 우선 표시한다.
+  * 삭제 성공 후 게시글 목록 페이지(`/posts`)로 이동한다.
 * 관련 API:
+  * `DELETE /api/posts/{postId}`
+* Response:
 
-  * `GET /api/posts/{postId}`
-  * `GET /api/categories`
-  * `PATCH /api/posts/{postId}`
-* 관련 화면:
+```json
+{
+  "status": 200,
+  "message": "게시글 삭제에 성공했습니다."
+}
+```
 
-  * `PostEditPage`
-  * `PostForm`
+* Status Code:
+
+| 상황 | Status |
+|---|---|
+| 삭제 성공 | 200 OK |
+| 게시글 없음 | 404 Not Found |
+
+* 프론트 처리 기준:
+  * 삭제 API 함수는 `response.data`를 반환한다.
+  * 삭제 요청은 확인 알림창에서 사용자가 "네"를 선택한 경우에만 실행한다.
+  * 에러 메시지는 `error.response?.data?.message`를 우선 사용한다.
+  * 서버 응답 메시지가 없으면 기본 에러 메시지를 사용한다.
+  * 삭제 성공 시 `/posts` 게시글 목록 페이지로 이동한다.
 * 참조 문서:
-
-  * `docs/ai/requirements.md`
-  * `docs/ai/api-usage.md`
+  * `docs/requirements.md`
+  * `docs/api-usage.md`
 
 ## 작업 브랜치
 
 * 기준 브랜치: `develop`
-* 작업 브랜치: `feature/issue-8-post-update-page`
-* PR 방향: `feature/issue-8-post-update-page` → `develop`
+* 작업 브랜치: `feature/issue-2-post-delete`
+* PR 방향: `feature/issue-2-post-delete` -> `develop`
 
 ## 이번 PR에서 할 일
 
-* [ ] `PostEditPage`에서 URL의 `postId` 추출
-* [ ] 게시글 상세 조회 API 함수 추가 또는 기존 함수 확인
-* [ ] 게시글 수정 API 함수 추가
-* [ ] 카테고리 목록 조회 API 재사용
-* [ ] 수정 페이지 진입 시 기존 게시글 정보 조회
-* [ ] 수정 페이지 진입 시 카테고리 목록 조회
-* [ ] 기존 게시글의 `categoryId`, `title`, `content`를 form 초기값으로 설정
-* [ ] `PostForm`을 작성/수정 페이지에서 재사용 가능하도록 확인
-* [ ] 수정 요청 시 `userId`, `categoryId`, `title`, `content`를 request body에 포함
-* [ ] `validateForm`을 재사용해 입력값 검증
-* [ ] 검증 실패 시 API 요청 없이 경고 메시지 표시
-* [ ] 수정 성공 시 성공 메시지 표시
-* [ ] 수정 성공 후 게시글 상세 페이지 또는 목록 페이지로 이동
-* [ ] 수정 실패 시 서버 에러 메시지 표시
-* [ ] 로딩 상태 처리
-* [ ] 에러 상태 처리
-* [ ] 사용하지 않는 import 제거
-* [ ] 수동 테스트 진행
+* [ ] `PostDetailPage`에 삭제 버튼 동작 연결
+* [ ] 삭제 버튼 클릭 시 삭제 확인 알림창 표시
+* [ ] 확인 알림창에서 "네" 선택 시 `DELETE /api/posts/{postId}` 요청
+* [ ] 확인 알림창에서 "아니오" 선택 시 삭제 요청 중단
+* [ ] `src/api/postApi.js`에 `deletePost(postId)` API 함수 추가
+* [ ] 삭제 요청 중 `isLoading` 상태로 화면 제어
+* [ ] 삭제 실패 시 `error` 상태와 서버 에러 메시지 표시
+* [ ] 삭제 성공 후 `/posts` 게시글 목록 페이지로 이동
+* [ ] 가능한 범위에서 `npm run build`, lint 명령이 있으면 `npm run lint` 확인
 
 ## 이번 PR에서 하지 않을 일
 
-* 게시글 상세 조회 백엔드 API 구현
-* 게시글 삭제 기능
-* 게시글 목록 UI 변경
-* 검색 / 페이징 / 정렬 조건
-* 댓글 기능
-* 로그인/토큰 기반 인증/인가 구조 변경
-* 전역 상태 관리 도입
-* 디자인 시스템 수준의 공통 컴포넌트 분리
+* 백엔드 API 명세 원본 수정
+* ERD 수정
+* 백엔드 API 구현 변경
+* DB 구조 변경
+* 인증/인가 구조 변경
+* 로그인 사용자 정보 영속화 또는 전역 인증 상태 구현
+* 권한별 삭제 버튼 노출 제어
+* JWT 또는 로그인 상태 기반 삭제 권한 처리
+* 게시글 목록/작성/수정 기능의 unrelated 리팩터링
+* 공통 모달 컴포넌트 신규 설계
+* 삭제 후 목록 데이터 자동 갱신 로직 별도 구현
 
 ## 완료 조건
 
-* [ ] 게시글 수정 페이지에서 기존 게시글 데이터가 정상 표시된다.
-* [ ] 카테고리 select에 카테고리 목록이 정상 표시된다.
-* [ ] 카테고리, 제목, 내용을 수정할 수 있다.
-* [ ] 입력값 검증이 정상 동작한다.
-* [ ] 수정 API 요청 payload가 백엔드 DTO와 일치한다.
-* [ ] 수정 성공 후 의도한 페이지로 이동한다.
-* [ ] 수정 실패 시 에러 메시지가 표시된다.
-* [ ] 브라우저 Console에 불필요한 에러가 없다.
-* [ ] Network 탭에서 요청/응답을 확인했다.
-* [ ] git diff 검토 완료
-* [ ] PR 본문 작성
+* [ ] 게시글 상세 페이지에서 삭제 버튼을 클릭하면 삭제 확인 알림창이 표시된다.
+* [ ] "아니오"를 선택하면 API 요청 없이 상세 페이지에 머문다.
+* [ ] "네"를 선택하면 `DELETE /api/posts/{postId}` 요청이 전송된다.
+* [ ] 삭제 요청 중에는 `isLoading` 상태로 중복 요청 또는 화면 상태가 제어된다.
+* [ ] 삭제 실패 시 서버 에러 메시지 또는 기본 에러 메시지가 표시된다.
+* [ ] 삭제 성공 응답을 받으면 `/posts` 게시글 목록 페이지로 이동한다.
+* [ ] `npm run build` 통과
+* [ ] lint 명령이 있으면 `npm run lint` 통과
+* [ ] 브라우저 수동 확인에서 Console에 불필요한 에러가 없다.
+* [ ] Network 탭에서 `DELETE /api/posts/{postId}` 요청과 Response 구조가 Issue의 API 명세와 일치한다.
+* [ ] 백엔드 API/DB/인증 구조 변경 없이 완료된다.
 
 ## 예상 변경 파일
 
-### 생성 가능
+### Architect 사전 반영 문서
 
-* `src/api/postApi.js` 내 `getPost`, `updatePost` 함수 추가
-* 필요 시 `src/utils/postValidation.js` 수정
+* `docs/requirements.md`
+* `docs/api-usage.md`
+* `docs/current-task.md`
 
-### 수정 가능
+### Builder 구현 변경 예상 파일
 
-* `docs/ai/current-task.md`
-* `docs/ai/api-usage.md`
-* `src/PostEditPage.jsx`
-* `src/component/PostForm.jsx`
-* `src/PostEditPage.css`
+#### Page
+
+* `src/pages/PostDetailPage.jsx`
+  * 실제 파일 위치가 다르면 Builder가 현재 구조 확인 후 해당 상세 페이지 파일만 수정
+
+#### Component
+
+* 없음 예상
+
+#### api
+
 * `src/api/postApi.js`
-* `src/utils/postValidation.js`
+
+#### utils
+
+* 없음 예상
+
+#### CSS
+
+* `src/pages/PostDetailPage.css` 또는 기존 상세 페이지 CSS 파일
+  * 필요 시에만 수정
+
+#### 기타
+
+* 없음 예상

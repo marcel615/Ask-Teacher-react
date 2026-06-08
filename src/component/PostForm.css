@@ -63,3 +63,11 @@
 .post-form-button:hover {
     background-color: #000;
 }
+
+.post-form-select:disabled,
+.post-form-input:disabled,
+.post-form-textarea:disabled,
+.post-form-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
