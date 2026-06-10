@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
-import { deletePost, getPostById } from './api/postApi'
+import { deletePost, getPost } from './api/postApi'
 import { postKeys } from './api/queryKeys'
 import './PostDetailPage.css'
 
@@ -25,13 +25,14 @@ function PostDetailPage() {
         error
     } = useQuery({
         queryKey: postKeys.detail(postId),
-        queryFn: () => getPostById(postId),
+        queryFn: () => getPost(postId),
         enabled: Boolean(postId)
     })
 
     const deleteMutation = useMutation({
         mutationFn: () => deletePost(postId),
         onSuccess: async () => {
+            queryClient.removeQueries({ queryKey: postKeys.detail(postId) })
             await queryClient.invalidateQueries({ queryKey: postKeys.all })
             navigate('/posts', { replace: true })
         },

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useForm, useWatch } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getPostById, updatePost } from './api/postApi'
+import { getPost, updatePost } from './api/postApi'
 import { getCategories } from './api/postCategoryApi'
 import { categoryKeys, postKeys } from './api/queryKeys'
 import PostForm from './component/PostForm'
@@ -28,7 +28,7 @@ function PostEditPage() {
 
     const postQuery = useQuery({
         queryKey: postKeys.detail(postId),
-        queryFn: () => getPostById(postId),
+        queryFn: () => getPost(postId),
         enabled: Boolean(postId)
     })
 

@@ -10,7 +10,7 @@ export const getPosts = async () => {
     return response.data.data
 }
 
-export const getPostById = async (postId) => {
+export const getPost = async (postId) => {
     const response = await api.get(`/posts/${postId}`)
     return response.data.data
 }
