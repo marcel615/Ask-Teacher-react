@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import Header from './component/Header'
 import AppRouter from './routes/AppRouter'
 import './App.css'

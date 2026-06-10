@@ -1,105 +1,112 @@
-import { useEffect, useState } from 'react'
-import {useParams, useNavigate} from 'react-router-dom'
-import PostForm from './component/PostForm'
-import './PostEditpage.css'
+import { useEffect } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useForm, useWatch } from 'react-hook-form'
+import { useNavigate, useParams } from 'react-router-dom'
 import { getPostById, updatePost } from './api/postApi'
 import { getCategories } from './api/postCategoryApi'
-import { validateForm } from './utils/postValidation'
+import { categoryKeys, postKeys } from './api/queryKeys'
+import PostForm from './component/PostForm'
+import './PostEditpage.css'
 
 function PostEditPage() {
     const { postId } = useParams()
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
+    const {
+        register,
+        handleSubmit,
+        reset,
+        control,
+        formState: { errors }
+    } = useForm({
+        defaultValues: {
+            categoryId: '',
+            title: '',
+            content: ''
+        }
+    })
 
-    const [title, setTitle] = useState('')
-    const [content, setContent] = useState('')
-    const [categoryId, setCategoryId] = useState('')
-    const [categoryList, setCategoryList] = useState([])
-    const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] = useState(null)
+    const postQuery = useQuery({
+        queryKey: postKeys.detail(postId),
+        queryFn: () => getPostById(postId),
+        enabled: Boolean(postId)
+    })
+
+    const categoryQuery = useQuery({
+        queryKey: categoryKeys.all,
+        queryFn: getCategories
+    })
 
     useEffect(() => {
-        const fetchEditData = async () => {
-            try {
-                setIsLoading(true)
-                setError(null)
-
-                const [postData, categories] = await Promise.all([
-                    getPostById(postId),
-                    getCategories()
-                ])
-
-                const selectedCategory = categories.find(category => (
-                    category.id === postData.categoryId ||
-                    category.name === postData.categoryName ||
-                    category.id === postData.category?.id ||
-                    category.name === postData.category?.name
-                ))
-
-                setTitle(postData.title ?? '')
-                setContent(postData.content ?? '')
-                setCategoryId(String(postData.categoryId ?? selectedCategory?.id ?? ''))
-                setCategoryList(categories)
-            } catch (error) {
-                setError(error.response?.data?.message ?? '게시글 수정 정보를 불러오지 못했습니다.')
-            } finally {
-                setIsLoading(false)
-            }
-        }
-
-        fetchEditData()
-    }, [postId])
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-
-        const validationMessage = validateForm(categoryId, title, content)
-        if (validationMessage) {
-            alert(validationMessage)
+        if (!postQuery.data || !categoryQuery.data) {
             return
         }
 
-        const postData = {
-            userId: 1,
-            categoryId: Number(categoryId),
-            title: title.trim(),
-            content: content.trim()
-        }
+        const selectedCategory = categoryQuery.data.find(category => (
+            category.id === postQuery.data.categoryId ||
+            category.name === postQuery.data.categoryName ||
+            category.id === postQuery.data.category?.id ||
+            category.name === postQuery.data.category?.name
+        ))
 
-        try {
-            setIsLoading(true)
-            setError(null)
+        reset({
+            categoryId: String(postQuery.data.categoryId ?? selectedCategory?.id ?? ''),
+            title: postQuery.data.title ?? '',
+            content: postQuery.data.content ?? ''
+        })
+    }, [categoryQuery.data, postQuery.data, reset])
 
-            await updatePost(postId, postData)
-
+    const updateMutation = useMutation({
+        mutationFn: postData => updatePost(postId, postData),
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: postKeys.all }),
+                queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) })
+            ])
             navigate(`/posts/${postId}`)
-        } catch (error) {
-            setError(error.response?.data?.message ?? '게시글 수정에 실패했습니다.')
-        } finally {
-            setIsLoading(false)
         }
+    })
+    const title = useWatch({ control, name: 'title' }) || ''
+    const content = useWatch({ control, name: 'content' }) || ''
+
+    const onSubmit = values => {
+        updateMutation.mutate({
+            userId: 1,
+            categoryId: Number(values.categoryId),
+            title: values.title.trim(),
+            content: values.content.trim()
+        })
     }
 
-    if (isLoading && !title && !content) {
+    if (postQuery.isLoading || categoryQuery.isLoading) {
         return <div className="post-edit-page">로딩 중...</div>
     }
+
+    const queryError = postQuery.error || categoryQuery.error
+    if (queryError) {
+        const message = queryError.response?.data?.message || '게시글 수정 정보를 불러오지 못했습니다.'
+        return <div className="post-edit-page">{message}</div>
+    }
+
+    const mutationError =
+        updateMutation.error?.response?.data?.message ||
+        (updateMutation.error ? '게시글 수정에 실패했습니다.' : '')
 
     return (
         <div className="post-edit-page">
             <h3 className="post-edit-page-title">Post Edit Form</h3>
-            {error && (
-                <p className="post-edit-page-error">{error}</p>
+            {mutationError && (
+                <p className="post-edit-page-error">{mutationError}</p>
             )}
             <PostForm
-                categoryId={categoryId}
-                setCategoryId={setCategoryId}
-                categoryList={categoryList}
-                title={title}
-                setTitle={setTitle}
-                content={content}
-                setContent={setContent}
-                onSubmit={handleSubmit}
-                submitText="수정"
-                disabled={isLoading}
+                categoryList={categoryQuery.data}
+                register={register}
+                errors={errors}
+                titleLength={title.length}
+                contentLength={content.length}
+                onSubmit={handleSubmit(onSubmit)}
+                submitText={updateMutation.isPending ? '수정 중...' : '수정'}
+                disabled={updateMutation.isPending}
             />
         </div>
     )

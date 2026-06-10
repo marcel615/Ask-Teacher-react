@@ -2,139 +2,119 @@
 
 ## 연결 Issue
 
-* Issue 번호: #2
-* Issue 제목: [Feature] post: 게시글 삭제 페이지
-* Issue URL: https://github.com/marcel615/Ask-Teacher-react/issues/2
+- Issue #13: [Feature] react: 프론트 API 구조 리팩토링
+- URL: https://github.com/marcel615/Ask-Teacher-react/issues/13
 
 ## 작업명
 
-* 게시글 상세 페이지 삭제 기능 구현
+React Query, React Hook Form, TypeScript 타입 기반 프론트 API 구조 리팩토링
 
 ## 작업 배경
 
-* 사용자가 게시글 상세 페이지에서 게시글을 삭제할 수 있어야 한다.
-* 삭제 버튼 클릭 시 즉시 삭제하지 않고 확인 알림창을 표시한 뒤, 사용자가 "네"를 선택한 경우에만 삭제 API를 호출한다.
-* 삭제 요청 성공 후에는 게시글 목록 페이지로 이동한다.
+현재 프론트 API 호출과 폼 상태 관리는 페이지별 로컬 상태와 직접 호출 흐름 중심으로 구성되어 있다.
+
+Issue #13에서는 API 조회/변경 요청을 React Query 기준으로 일관화하고, 게시글 작성/수정 폼을 React Hook Form 기반으로 정리하며, 게시글 API 요청/응답 데이터를 TypeScript 타입으로 관리하도록 개선한다.
 
 ## 참조 설계
 
-API / ERD / 요구사항 전체를 복사하지 않는다. 이번 Issue와 직접 관련된 요약과 참조만 적는다.
-
-* 관련 요구사항:
-  * 게시글 삭제 기능
-  * 게시글 상세 페이지에서 삭제 버튼을 클릭할 수 있다.
-  * 삭제 버튼 클릭 시 게시글 삭제 여부를 확인하는 알림창을 표시한다.
-  * 사용자가 "네"를 선택하면 삭제 요청을 보낸다.
-  * 사용자가 "아니오"를 선택하면 삭제 요청을 보내지 않고 상세 페이지에 머문다.
-  * 삭제 요청 중에는 `isLoading` 상태로 화면을 제어한다.
-  * 삭제 실패 시 `error` 상태를 설정하고 서버 에러 메시지를 우선 표시한다.
-  * 삭제 성공 후 게시글 목록 페이지(`/posts`)로 이동한다.
-* 관련 API:
-  * `DELETE /api/posts/{postId}`
-* Response:
-
-```json
-{
-  "status": 200,
-  "message": "게시글 삭제에 성공했습니다."
-}
-```
-
-* Status Code:
-
-| 상황 | Status |
-|---|---|
-| 삭제 성공 | 200 OK |
-| 게시글 없음 | 404 Not Found |
-
-* 프론트 처리 기준:
-  * 삭제 API 함수는 `response.data`를 반환한다.
-  * 삭제 요청은 확인 알림창에서 사용자가 "네"를 선택한 경우에만 실행한다.
-  * 에러 메시지는 `error.response?.data?.message`를 우선 사용한다.
-  * 서버 응답 메시지가 없으면 기본 에러 메시지를 사용한다.
-  * 삭제 성공 시 `/posts` 게시글 목록 페이지로 이동한다.
-* 참조 문서:
-  * `docs/requirements.md`
-  * `docs/api-usage.md`
+- 조회 API는 React Query `useQuery`로 처리한다.
+- 게시글 작성/수정/삭제, 회원가입, 로그인 요청은 React Query `useMutation`으로 처리한다.
+- 게시글 작성/수정/삭제 성공 후 관련 게시글 query를 갱신한다.
+- 게시글 작성/수정 폼은 React Hook Form으로 입력값과 검증을 관리한다.
+- 게시글 요청/응답 데이터는 TypeScript 타입 정의를 기반으로 관리한다.
+- 기존 백엔드 API 원본 명세는 수정하지 않는다.
 
 ## 작업 브랜치
 
-* 기준 브랜치: `develop`
-* 작업 브랜치: `feature/issue-2-post-delete`
-* PR 방향: `feature/issue-2-post-delete` -> `develop`
+- 기준 브랜치: `develop`
+- 작업 브랜치: `feature/issue-13-react-api-refactor`
+- PR 방향: `feature/issue-13-react-api-refactor` -> `develop`
 
 ## 이번 PR에서 할 일
 
-* [ ] `PostDetailPage`에 삭제 버튼 동작 연결
-* [ ] 삭제 버튼 클릭 시 삭제 확인 알림창 표시
-* [ ] 확인 알림창에서 "네" 선택 시 `DELETE /api/posts/{postId}` 요청
-* [ ] 확인 알림창에서 "아니오" 선택 시 삭제 요청 중단
-* [ ] `src/api/postApi.js`에 `deletePost(postId)` API 함수 추가
-* [ ] 삭제 요청 중 `isLoading` 상태로 화면 제어
-* [ ] 삭제 실패 시 `error` 상태와 서버 에러 메시지 표시
-* [ ] 삭제 성공 후 `/posts` 게시글 목록 페이지로 이동
-* [ ] 가능한 범위에서 `npm run build`, lint 명령이 있으면 `npm run lint` 확인
+- [ ] React Query 기반 API 조회/변경 요청 구조 적용
+- [ ] 게시글 목록 조회를 `useQuery`로 변경
+- [ ] 게시글 상세 조회를 `useQuery`로 변경
+- [ ] 게시글 작성/수정/삭제를 `useMutation`으로 변경
+- [ ] 회원가입/로그인을 `useMutation`으로 변경
+- [ ] 게시글 작성/수정 성공 후 게시글 목록/상세 query 갱신
+- [ ] 게시글 삭제 성공 후 게시글 목록 query 갱신
+- [ ] 게시글 작성/수정 폼을 React Hook Form 기반으로 변경
+- [ ] 제목, 내용 등 필수 입력값 프론트 검증 유지
+- [ ] 게시글 API 요청/응답 TypeScript 타입 정의 추가
+- [ ] API 함수 반환 기준은 기존 문서 기준과 일치하도록 유지
+- [ ] `docs/requirements.md`에 React Query / React Hook Form / TypeScript 타입 기준 반영
+- [ ] `docs/api-usage.md`에 query key, mutation, invalidate, 타입 관리 기준 반영
 
 ## 이번 PR에서 하지 않을 일
 
-* 백엔드 API 명세 원본 수정
-* ERD 수정
-* 백엔드 API 구현 변경
-* DB 구조 변경
-* 인증/인가 구조 변경
-* 로그인 사용자 정보 영속화 또는 전역 인증 상태 구현
-* 권한별 삭제 버튼 노출 제어
-* JWT 또는 로그인 상태 기반 삭제 권한 처리
-* 게시글 목록/작성/수정 기능의 unrelated 리팩터링
-* 공통 모달 컴포넌트 신규 설계
-* 삭제 후 목록 데이터 자동 갱신 로직 별도 구현
+- 백엔드 API 명세 원본 수정
+- 백엔드 API, DB, 인증/인가 구조 변경
+- JWT 저장, 전역 로그인 상태 관리, 권한 제어 구현
+- 댓글, 검색, 페이징, 좋아요, 파일 업로드 구현
+- 디자인 시스템 수준의 공통 UI 컴포넌트 도입
+- Issue #13 범위를 벗어난 화면/기능 개선
 
 ## 완료 조건
 
-* [ ] 게시글 상세 페이지에서 삭제 버튼을 클릭하면 삭제 확인 알림창이 표시된다.
-* [ ] "아니오"를 선택하면 API 요청 없이 상세 페이지에 머문다.
-* [ ] "네"를 선택하면 `DELETE /api/posts/{postId}` 요청이 전송된다.
-* [ ] 삭제 요청 중에는 `isLoading` 상태로 중복 요청 또는 화면 상태가 제어된다.
-* [ ] 삭제 실패 시 서버 에러 메시지 또는 기본 에러 메시지가 표시된다.
-* [ ] 삭제 성공 응답을 받으면 `/posts` 게시글 목록 페이지로 이동한다.
-* [ ] `npm run build` 통과
-* [ ] lint 명령이 있으면 `npm run lint` 통과
-* [ ] 브라우저 수동 확인에서 Console에 불필요한 에러가 없다.
-* [ ] Network 탭에서 `DELETE /api/posts/{postId}` 요청과 Response 구조가 Issue의 API 명세와 일치한다.
-* [ ] 백엔드 API/DB/인증 구조 변경 없이 완료된다.
+- [ ] 게시글 목록 조회가 React Query `useQuery`로 동작한다.
+- [ ] 게시글 상세 조회가 React Query `useQuery`로 동작한다.
+- [ ] 게시글 작성/수정/삭제가 React Query `useMutation`으로 동작한다.
+- [ ] 회원가입/로그인이 React Query `useMutation`으로 동작한다.
+- [ ] 게시글 작성/수정/삭제 성공 후 관련 게시글 데이터가 갱신된다.
+- [ ] 게시글 작성/수정 폼이 React Hook Form으로 입력값을 관리한다.
+- [ ] 제목, 내용 등 필수 입력값 검증 실패 시 API 요청을 보내지 않는다.
+- [ ] 게시글 API 요청/응답 타입이 TypeScript 타입으로 관리된다.
+- [ ] `npm run build`가 성공한다.
+- [ ] lint 명령이 있다면 `npm run lint`가 성공한다.
+- [ ] 브라우저 수동 확인에서 주요 API 요청/응답과 Console 에러 여부를 확인한다.
+
+## 확인 필요
+
+- 인증 API 경로는 `POST /api/auth/signup`, `POST /api/auth/login` 기준으로 구현한다.
 
 ## 예상 변경 파일
 
 ### Architect 사전 반영 문서
 
-* `docs/requirements.md`
-* `docs/api-usage.md`
-* `docs/current-task.md`
+- `docs/requirements.md`
+- `docs/api-usage.md`
+- `docs/current-task.md`
 
 ### Builder 구현 변경 예상 파일
 
 #### Page
 
-* `src/pages/PostDetailPage.jsx`
-  * 실제 파일 위치가 다르면 Builder가 현재 구조 확인 후 해당 상세 페이지 파일만 수정
+- `src/pages/PostListPage.*`
+- `src/pages/PostDetailPage.*`
+- `src/pages/PostCreatePage.*`
+- `src/pages/PostEditPage.*`
+- `src/pages/SignupPage.*`
+- `src/pages/LoginPage.*`
 
 #### Component
 
-* 없음 예상
+- `src/components/PostForm.*`
 
 #### api
 
-* `src/api/postApi.js`
+- `src/api/postApi.*`
+- `src/api/authApi.*`
+- `src/api/postCategoryApi.*`
+- React Query 설정 파일 또는 query client 설정 위치
 
 #### utils
 
-* 없음 예상
+- 게시글 validation 관련 파일
+- 게시글 요청/응답 TypeScript 타입 정의 파일
+- 공통 API 응답 TypeScript 타입 정의 파일
 
 #### CSS
 
-* `src/pages/PostDetailPage.css` 또는 기존 상세 페이지 CSS 파일
-  * 필요 시에만 수정
+- 기존 페이지/폼 CSS 중 React Hook Form 에러 표시와 상태 표시 변경에 필요한 파일
 
 #### 기타
 
-* 없음 예상
+- `package.json`
+- `package-lock.json` 또는 사용 중인 lockfile
+- 앱 루트의 React Query Provider 설정 파일
