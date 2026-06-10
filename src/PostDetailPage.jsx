@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
-import { deletePost, getPostById } from './api/postApi'
+import { deletePost, getPost } from './api/postApi'
+import { postKeys } from './api/queryKeys'
 import './PostDetailPage.css'
 
-const formatDateTime = (dateTime) => {
+const formatDateTime = dateTime => {
     if (!dateTime) {
         return ''
     }
@@ -14,30 +16,33 @@ const formatDateTime = (dateTime) => {
 function PostDetailPage() {
     const { postId } = useParams()
     const navigate = useNavigate()
-
-    const [post, setPost] = useState(null)
-    const [isLoading, setIsLoading] = useState(true)
-    const [isDeleting, setIsDeleting] = useState(false)
-    const [error, setError] = useState(null)
+    const queryClient = useQueryClient()
     const [deleteError, setDeleteError] = useState(null)
 
-    useEffect(() => {
-        const fetchPostDetail = async () => {
-            try {
-                const data = await getPostById(postId)
-                setPost(data)
-            } catch (error) {
-                setError(error.response?.data?.message ?? '게시글 상세 조회에 실패했습니다.')
-            } finally {
-                setIsLoading(false)
-            }
+    const {
+        data: post,
+        isLoading,
+        error
+    } = useQuery({
+        queryKey: postKeys.detail(postId),
+        queryFn: () => getPost(postId),
+        enabled: Boolean(postId)
+    })
+
+    const deleteMutation = useMutation({
+        mutationFn: () => deletePost(postId),
+        onSuccess: async () => {
+            queryClient.removeQueries({ queryKey: postKeys.detail(postId) })
+            await queryClient.invalidateQueries({ queryKey: postKeys.all })
+            navigate('/posts', { replace: true })
+        },
+        onError: error => {
+            setDeleteError(error.response?.data?.message ?? '게시글 삭제에 실패했습니다.')
         }
+    })
 
-        fetchPostDetail()
-    }, [postId])
-
-    const handleDelete = async () => {
-        if (isDeleting) {
+    const handleDelete = () => {
+        if (deleteMutation.isPending) {
             return
         }
 
@@ -46,53 +51,44 @@ function PostDetailPage() {
             return
         }
 
-        try {
-            setIsDeleting(true)
-            setDeleteError(null)
-
-            await deletePost(postId)
-
-            navigate('/posts', { replace: true })
-        } catch (error) {
-            setDeleteError(error.response?.data?.message ?? '게시글 삭제에 실패했습니다.')
-        } finally {
-            setIsDeleting(false)
-        }
+        setDeleteError(null)
+        deleteMutation.mutate()
     }
 
     if (isLoading) {
-        return <div className='post-detail-page'>로딩 중...</div>
+        return <div className="post-detail-page">로딩 중...</div>
     }
 
     if (error) {
-        return <div className='post-detail-page'>{error}</div>
+        const message = error.response?.data?.message ?? '게시글 상세 조회에 실패했습니다.'
+        return <div className="post-detail-page">{message}</div>
     }
 
     return (
-        <div className='post-detail-page'>
-            <div className='post-detail-meta'>
+        <div className="post-detail-page">
+            <div className="post-detail-meta">
                 <span>{post.categoryName}</span>
                 <span>{formatDateTime(post.createdAt)}</span>
             </div>
-            <h3 className='post-detail-title'>{post.title}</h3>
-            <p className='post-detail-content'>{post.content}</p>
+            <h3 className="post-detail-title">{post.title}</h3>
+            <p className="post-detail-content">{post.content}</p>
             {deleteError && (
-                <p className='post-detail-error'>{deleteError}</p>
+                <p className="post-detail-error">{deleteError}</p>
             )}
-            <div className='post-detail-actions'>
+            <div className="post-detail-actions">
                 <button
-                    className='post-detail-edit-button'
-                    disabled={isDeleting}
+                    className="post-detail-edit-button"
+                    disabled={deleteMutation.isPending}
                     onClick={() => navigate(`/posts/${post.postId ?? post.id ?? postId}/edit`)}
                 >
                     수정
                 </button>
                 <button
-                    className='post-detail-delete-button'
-                    disabled={isDeleting}
+                    className="post-detail-delete-button"
+                    disabled={deleteMutation.isPending}
                     onClick={handleDelete}
                 >
-                    {isDeleting ? '삭제 중...' : '삭제'}
+                    {deleteMutation.isPending ? '삭제 중...' : '삭제'}
                 </button>
             </div>
         </div>

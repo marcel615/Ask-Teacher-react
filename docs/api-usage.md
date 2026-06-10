@@ -47,6 +47,33 @@ src/api/
 
 ---
 
+## React Query 사용 기준
+
+| 기능 | Query/Mutation | Key 기준 | 성공 후 갱신 |
+|---|---|---|---|
+| 게시글 목록 조회 | `useQuery` | `['posts']` | - |
+| 게시글 상세 조회 | `useQuery` | `['posts', postId]` | - |
+| 게시글 작성 | `useMutation` | - | `['posts']` invalidate |
+| 게시글 수정 | `useMutation` | - | `['posts']`, `['posts', postId]` invalidate |
+| 게시글 삭제 | `useMutation` | - | `['posts']` invalidate |
+| 회원가입 | `useMutation` | - | 없음 |
+| 로그인 | `useMutation` | - | 없음 |
+
+## TypeScript 타입 관리 기준
+
+- 게시글 목록/상세/작성/수정 요청 및 응답 타입을 정의한다.
+- API 함수는 정의된 요청/응답 타입을 사용한다.
+- 백엔드 `ApiResponse<T>` 구조를 반영할 수 있는 공통 타입을 둔다.
+- API 함수 반환 기준은 기존 기준을 유지한다.
+  - 조회 API: 실제 데이터
+  - 작성/수정/삭제/인증 API: `ApiResponse` 응답 객체
+
+## 확인 필요
+
+- 인증 API 경로는 `/api/auth/signup`, `/api/auth/login` 기준으로 사용한다.
+
+---
+
 ## 응답 데이터 메모
 
 ### 게시글 목록 조회

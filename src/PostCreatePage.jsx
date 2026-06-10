@@ -1,92 +1,85 @@
-import { useState, useEffect } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useForm, useWatch } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
-import PostForm from './component/PostForm'
-import './PostCreatePage.css'
 import { createPost } from './api/postApi'
 import { getCategories } from './api/postCategoryApi'
-import { validateForm } from './utils/postValidation'
+import { categoryKeys, postKeys } from './api/queryKeys'
+import PostForm from './component/PostForm'
+import './PostCreatePage.css'
 
 function PostCreatePage() {
-    const [title, setTitle] = useState('')
-    const [content, setContent] = useState('')
-    const [isLoading, setIsLoading] = useState(true)
-    const [error, setError] = useState(null)
-    const [categoryId, setCategoryId] = useState('')
-    const [categoryList, setCategoryList] = useState([])
     const navigate = useNavigate()
-
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await getCategories()
-
-                setCategoryList(data)
-            } catch (error) {
-                console.error('카테고리 목록 조회 실패:', error.response?.data?.message)
-
-                setError(error.response?.data?.message)
-            } finally {
-                setIsLoading(false)
-            }
+    const queryClient = useQueryClient()
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors }
+    } = useForm({
+        defaultValues: {
+            categoryId: '',
+            title: '',
+            content: ''
         }
+    })
 
-        fetchCategories()
-    }, [])
+    const {
+        data: categoryList = [],
+        isLoading: isCategoryLoading,
+        error: categoryError
+    } = useQuery({
+        queryKey: categoryKeys.all,
+        queryFn: getCategories
+    })
 
-    if (isLoading) {
-        return <div className='post-create-page'>로딩 중...</div>
-    }
-    if (error) {
-        return <div className='post-create-page'>오류가 발생했습니다. {error}</div>
-    }
-
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-
-        const validationMessage = validateForm(categoryId, title, content)
-        if (validationMessage) {
-            alert(validationMessage)
-            return
-        }
-
-        const postData = {
-            userId: 1,
-            categoryId: Number(categoryId),
-            title: title.trim(),
-            content: content.trim()
-        }
-        try {
-            const data = await createPost(postData)
-
-            console.log('게시글 작성 성공:', data)
-            alert('게시글이 성공적으로 작성되었습니다.')
-
+    const createMutation = useMutation({
+        mutationFn: createPost,
+        onSuccess: async response => {
+            await queryClient.invalidateQueries({ queryKey: postKeys.all })
+            alert(response.message || '게시글이 성공적으로 작성되었습니다.')
             navigate('/posts')
-        } catch (error) {
-            console.error('게시글 작성 실패:', error.response?.data?.message)
-
-            setError(error.response?.data?.message)
         }
+    })
+    const title = useWatch({ control, name: 'title' }) || ''
+    const content = useWatch({ control, name: 'content' }) || ''
+
+    const onSubmit = values => {
+        createMutation.mutate({
+            userId: 1,
+            categoryId: Number(values.categoryId),
+            title: values.title.trim(),
+            content: values.content.trim()
+        })
     }
+
+    if (isCategoryLoading) {
+        return <div className="post-create-page">로딩 중...</div>
+    }
+
+    if (categoryError) {
+        const message = categoryError.response?.data?.message || '카테고리 목록을 불러오지 못했습니다.'
+        return <div className="post-create-page">{message}</div>
+    }
+
+    const mutationError =
+        createMutation.error?.response?.data?.message ||
+        (createMutation.error ? '게시글 작성에 실패했습니다.' : '')
 
     return (
         <div className="post-create-page">
             <h3 className="post-create-title">Post Create Page</h3>
-            {error && (
-                <p className="error-message">
-                    게시글 작성 중 오류가 발생했습니다: {error}
-                </p>
+            {mutationError && (
+                <p className="error-message">{mutationError}</p>
             )}
-            <PostForm 
-                categoryId={categoryId}
-                setCategoryId={setCategoryId}
+            <PostForm
                 categoryList={categoryList}
-                title={title}
-                setTitle={setTitle}
-                content={content}
-                setContent={setContent}
-                onSubmit={handleSubmit}
-                submitText="작성"
+                register={register}
+                errors={errors}
+                titleLength={title.length}
+                contentLength={content.length}
+                onSubmit={handleSubmit(onSubmit)}
+                submitText={createMutation.isPending ? '작성 중...' : '작성'}
+                disabled={createMutation.isPending}
             />
         </div>
     )
