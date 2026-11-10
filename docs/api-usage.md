@@ -1,3 +1,6 @@
+> 보존용 과거 문서 — 현재 공식 명세가 아닙니다. 공식 원본은 Specs main의 [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md)입니다.
+> 이 문서는 계약 충돌과 과거 Issue 결정을 손실 없이 보존하기 위해 삭제를 보류했습니다. 신규 구현 기준으로 사용하지 않습니다. 비교·미결정 사항은 [명세 이전 검토](spec-migration-review.md), Frontend 내부 구현은 [개발 안내](frontend-development.md)를 확인하세요.
+
 # API 사용 정리
 
 ## 공통 기준
