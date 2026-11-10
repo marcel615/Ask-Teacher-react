@@ -18,3 +18,5 @@
 - Main은 구현 게이트를 통과시켜 commit 87ea5e4485b429aff4b44c291c8b03da47f888cd를 push하고 [PR #23](https://github.com/marcel615/Ask-Teacher-react/pull/23)을 develop 대상으로 생성했다. 자동 Project 상태가 In Progress에 남아 있어 실제 PR 단계인 In Review로 갱신·재조회했다. 초기 PR은 OPEN·MERGEABLE이며 statusCheckRollup은 빈 목록이다. Architect 독립 리뷰와 Reporter 기록을 이어서 진행한다.
 - PR #23 Architect 독립 리뷰의 필수 수정은 0건이다. Main이 승인한 선택 개선 1건으로 Skill 진행 순서 6의 검증 표현을 현재 스택의 관련 자동·기능 검증과 build/lint 명령으로 명료화했다. Skill 검사기와 git diff --check로 관련 변경을 재검증했다.
 - Main은 Reporter의 사실·미검증 구분을 확인해 승인했고 docs/devlog/2026-11.md에 이번 작업만 새 월별 항목으로 반영했다. 기존 기록은 유지했다. 관련 기록·선택 개선을 최종 commit·push한 뒤 정확한 head의 외부 상태를 다시 확인하며, merge 대기 중에는 추적 파일을 수정하지 않고 GitHub 상태와 대화 보고를 재개 근거로 삼는다. 기존 제품 Issue와 겹치는 계약 차이를 별도 후속 Issue로 중복 생성하지 않았다.
+
+- 사용자 추가 요청에 따라 중복 문서와 사본을 정리한다. 앞선 보존 결정은 이 요청으로 변경됐다. 원본은 기준 커밋과 PR에서 추적하며 계약 차이는 PR에 보존한다.

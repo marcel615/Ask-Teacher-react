@@ -9,7 +9,7 @@ Ask Teacher는 사용자가 질문 게시글을 작성하고 조회할 수 있�
 
 Ask Teacher Frontend는 사용자가 브라우저에서 질문 게시글을 작성하고 관리할 수 있도록 만든 MVP 화면입니다. React Router로 주요 페이지를 연결하고, Axios 기반 API 모듈을 통해 백엔드의 게시글, 카테고리, 인증 API를 호출합니다.
 
-현재 구현 범위는 게시글 목록/작성/상세/수정/삭제, 회원가입, 로그인, 카테고리 조회입니다. JWT 저장, 전역 로그인 상태 관리, 권한 기반 버튼 제어는 당시 MVP 범위에서 제외했습니다. 현재 공식 인증 계약과 기존 구현의 차이는 [명세 이전 검토](docs/spec-migration-review.md)에 기록했으며, 최신 Backend와의 연동 완료를 뜻하지 않습니다.
+현재 구현 범위는 게시글 목록/작성/상세/수정/삭제, 회원가입, 로그인, 카테고리 조회입니다. JWT 저장, 전역 로그인 상태 관리, 권한 기반 버튼 제어는 당시 MVP 범위에서 제외했습니다. 현재 공식 인증 계약과 기존 구현의 차이는 [PR #23](https://github.com/marcel615/Ask-Teacher-react/pull/23)에 기록했으며, 최신 Backend와의 연동 완료를 뜻하지 않습니다.
 
 ## 기술 스택
 
@@ -98,8 +98,6 @@ API 기능은 도메인별 파일로 분리했습니다.
 공식 명세 원본은 marcel615/Ask-Teacher-specs의 main 브랜치입니다.
 
 - [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md)
-- [Frontend 내부 구현 안내](docs/frontend-development.md): API 함수·사용 위치, React Query·React Hook Form·타입 기준
-- [명세 이전 검토](docs/spec-migration-review.md): 보존 정보와 미해결 충돌. 과거 중복 두 문서는 충돌 해결 전 삭제를 보류하고 공식 명세 참조에서 제외했습니다.
 
 ## ERD
 

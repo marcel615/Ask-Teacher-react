@@ -39,7 +39,6 @@
 - Issue 템플릿: `.github/ISSUE_TEMPLATE/feature_request.yml`
 - 공통 명세 공식 원본: `marcel615/Ask-Teacher-specs`의 `main` 브랜치. Frontend에는 원문을 복사하지 않고 작업별 요약과 원본 링크만 둔다.
 - 공식 명세: [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md)
-- Frontend 구현 안내: `docs/frontend-development.md` (공식 계약과 구현 현황을 구분한다.)
 - 현재 작업 범위: `docs/current-task.md`
 - 역할 설정: `.codex/agents/`의 Architect·Builder·Reporter. Main은 이 문서와 issue-driven-dev에서 정의한다.
 - 리뷰 기준: `docs/review-checklist.md`

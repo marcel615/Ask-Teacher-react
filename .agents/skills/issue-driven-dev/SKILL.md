@@ -120,7 +120,7 @@ description: 사용자의 작업 시작 지시에 따라 GitHub Issue를 선정�
 ## React 구현 기준
 
 - 현재 스택은 React 19, Vite 8, React Router 7, Axios, React Query 5, React Hook Form 7, CSS다. JSX/JavaScript에 JSDoc과 `src/types/apiTypes.d.ts`를 사용하며 전체 TypeScript 전환은 별도 Issue #20이다.
-- 조회는 `useQuery`, 사용자 변경 요청은 `useMutation`과 이벤트 핸들러로 관리한다. query key·무효화·삭제 캐시 정리는 `docs/frontend-development.md`와 현재 구현을 확인한다.
+- 조회는 `useQuery`, 사용자 변경 요청은 `useMutation`과 이벤트 핸들러로 관리한다. query key·무효화·삭제 캐시 정리는 `src/api/queryKeys.js`와 현재 구현을 확인한다.
 - 공식 API 응답·인증 계약을 우선 확인한다. 기존 `response.data.data`와 `ApiResponse`는 현재 남은 과거 구현이며 신규 계약의 규칙으로 일반화하지 않는다. 기존 불일치는 범위 밖에서 임의 수정하지 않고 보고한다.
 - React Hook Form 검증 실패 시 요청을 보내지 않고 오류 시 입력을 유지한다. 조회·mutation의 로딩/실패/빈 상태와 중복 제출 방지를 확인한다. 에러 응답 메시지를 우선 사용하고 서버 응답이 없으면 기본 메시지를 사용한다.
 - API 함수는 `src/api`에 두고 기존 Page·Component·CSS 구조를 따른다. 사용하지 않는 import와 불필요한 console.log를 추가하지 않는다.

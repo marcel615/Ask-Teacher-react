@@ -4,14 +4,14 @@
 
 - [Issue #22: Frontend AI-DLC 워크플로우 및 공식 명세 참조 개편](https://github.com/marcel615/Ask-Teacher-react/issues/22)
 - 2026-11-10 사용자 요청에 따라 이번 문서·설정 정비와 develop 대상 단일 PR까지 진행한다. Main은 Issue #22의 선행 관계 없음·미결정 라벨 없음과 Project의 Ready 상태를 확인한 후 In Progress로 전환했다.
-- 이전 Issue #13은 [PR #19](https://github.com/marcel615/Ask-Teacher-react/pull/19)의 merge(2026-06-10, `31efac3c9191d91ac73c64471e68e19e0f5e3b5f`)와 기존 2026-06 devlog 반영을 Main이 확인했다. 이전 current-task 원문은 `docs/archive/issue-13-current-task.md`에 보존한다.
+- 이전 Issue #13은 [PR #19](https://github.com/marcel615/Ask-Teacher-react/pull/19)의 merge(2026-06-10, `31efac3c9191d91ac73c64471e68e19e0f5e3b5f`)와 기존 2026-06 devlog 반영을 Main이 확인했다. 이전 current-task 원문은 [기준 커밋](https://github.com/marcel615/Ask-Teacher-react/blob/31efac3c9191d91ac73c64471e68e19e0f5e3b5f/docs/current-task.md)에서 확인한다.
 - 한 번에 Issue #22만 진행하며 Main의 품질 게이트와 Backend의 일반 Issue 기반 절차를 따른다.
 
 ## 참조
 
 - Backend develop: `61cd8c5e3cf9bc239e14cef7c5e0bb6dab632b1d`의 AGENTS, Skill, 역할 설정과 개발 문서.
 - Specs main 확인 SHA: `3b30bbd23cad618a6a16b022dbd03c7f2d1fc69f`. 공식 원본: [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md).
-- 차이·보존 근거: `docs/spec-migration-review.md`.
+- 차이·보존 근거: [PR #23](https://github.com/marcel615/Ask-Teacher-react/pull/23).
 
 ## 브랜치와 PR
 
@@ -25,7 +25,7 @@
 - Java/Spring 구현·검증 기준을 현재 React 스택에 맞춘다.
 - issue-driven-dev만 유지하고 제거 대상 Skill의 활성 참조를 없앤다. 필요한 접근·백로그 전환 조건은 유지하는 Skill에 포함한다.
 - AGENTS, Skill, 역할 설정, README, 빠른 지시문, 리뷰 체크리스트, Issue·PR 템플릿의 공식 명세 참조를 네 문서로 통일한다.
-- Frontend 고유 구현 정보는 frontend-development에 보존한다. 과거 요구사항/API 문서의 미해결 충돌은 보고하고 원문 삭제를 보류한다.
+- 공식 명세와 실제 코드를 기준으로 중복 문서를 정리하고 미해결 계약 차이와 과거 원본 링크는 PR에 보존한다.
 - 임시 작업 기록과 이번 월 devlog를 작성한다. 기존 개발 이력과 이전 current-task 원문을 보존한다.
 
 ## 제외 범위
@@ -50,7 +50,5 @@
 - `.codex/agents/architect.toml`, `.codex/agents/builder.toml`, `.codex/agents/reporter.toml`
 - `.github/ISSUE_TEMPLATE/feature_request.yml`, `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`
 - `docs/current-task.md`, `docs/current-work-log.md`, `docs/prompts/quick.md`, `docs/review-checklist.md`
-- `docs/frontend-development.md`, `docs/spec-migration-review.md`
-- 보존 헤더만: `docs/requirements.md`, `docs/api-usage.md`
-- 보존 사본: `docs/archive/issue-13-current-task.md`
+- 삭제: `docs/frontend-development.md`, `docs/spec-migration-review.md`, `docs/requirements.md`, `docs/api-usage.md`, `docs/archive/issue-13-current-task.md`
 - append-only: `docs/devlog/2026-11.md`
