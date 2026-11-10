@@ -3,6 +3,10 @@ description: 기능 추가 / 수정 / 개선 요청
 title: "[Feature] "
 labels: ["feature"]
 body:
+  - type: markdown
+    attributes:
+      value: |
+        공식 명세는 Specs main의 [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md)입니다. 관련 요약과 원본 링크를 남기고 미결정 사항을 구분하세요.
   - type: textarea
     id: background
     attributes:
@@ -43,11 +47,12 @@ body:
     id: api
     attributes:
       label: 관련 API
-      description: 사용하는 백엔드 API가 있다면 작성한다.
+      description: Specs main의 API 및 인증 계약 원본 링크와 관련 요청·응답을 확인하고, 미결정 사항은 추측하지 말고 질문으로 남긴다.
       placeholder: |
         예)
         - GET /api/posts/{postId}
-        - 응답 data: postId, title, content, writerNickname, createdAt
+        - 공식 API: https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md
+        - UI 동작: https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md
     validations:
       required: false
 
@@ -61,7 +66,9 @@ body:
         - [ ] 로딩 상태 처리
         - [ ] 에러 상태 처리
         - [ ] 입력값 검증
-        - [ ] 수동 테스트 완료
+        - [ ] npm run build / npm run lint
+        - [ ] 관련 자동·통합 검증과 화면 / Network / Console 확인
+        - [ ] 실제 결과와 미검증 사항 기록
     validations:
       required: true
 

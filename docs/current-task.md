@@ -1,120 +1,54 @@
 # Current Task
 
-## 연결 Issue
+## 요청과 승인 근거
 
-- Issue #13: [Feature] react: 프론트 API 구조 리팩토링
-- URL: https://github.com/marcel615/Ask-Teacher-react/issues/13
+- [Issue #22: Frontend AI-DLC 워크플로우 및 공식 명세 참조 개편](https://github.com/marcel615/Ask-Teacher-react/issues/22)
+- 2026-11-10 사용자 요청에 따라 이번 문서·설정 정비와 develop 대상 단일 PR까지 진행한다. Main은 Issue #22의 선행 관계 없음·미결정 라벨 없음과 Project의 Ready 상태를 확인한 후 In Progress로 전환했다.
+- 이전 Issue #13은 [PR #19](https://github.com/marcel615/Ask-Teacher-react/pull/19)의 merge(2026-06-10, `31efac3c9191d91ac73c64471e68e19e0f5e3b5f`)와 기존 2026-06 devlog 반영을 Main이 확인했다. 이전 current-task 원문은 [기준 커밋](https://github.com/marcel615/Ask-Teacher-react/blob/31efac3c9191d91ac73c64471e68e19e0f5e3b5f/docs/current-task.md)에서 확인한다.
+- 한 번에 Issue #22만 진행하며 Main의 품질 게이트와 Backend의 일반 Issue 기반 절차를 따른다.
 
-## 작업명
+## 참조
 
-React Query, React Hook Form, TypeScript 타입 기반 프론트 API 구조 리팩토링
+- Backend develop: `61cd8c5e3cf9bc239e14cef7c5e0bb6dab632b1d`의 AGENTS, Skill, 역할 설정과 개발 문서.
+- Specs main 확인 SHA: `3b30bbd23cad618a6a16b022dbd03c7f2d1fc69f`. 공식 원본: [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md).
+- 차이·보존 근거: [PR #23](https://github.com/marcel615/Ask-Teacher-react/pull/23).
 
-## 작업 배경
+## 브랜치와 PR
 
-현재 프론트 API 호출과 폼 상태 관리는 페이지별 로컬 상태와 직접 호출 흐름 중심으로 구성되어 있다.
+- 기준: develop `31efac3c9191d91ac73c64471e68e19e0f5e3b5f`
+- 작업: `feature/issue-22-ai-dlc-workflow`
+- PR: `feature/issue-22-ai-dlc-workflow` → `develop`, 하나만 생성. Merge는 사용자 직접 수행.
 
-Issue #13에서는 API 조회/변경 요청을 React Query 기준으로 일관화하고, 게시글 작성/수정 폼을 React Hook Form 기반으로 정리하며, 게시글 API 요청/응답 데이터를 TypeScript 타입으로 관리하도록 개선한다.
+## 범위
 
-## 참조 설계
+- Main·Architect·Builder·Reporter 역할, 순차 실행, 승인 경계, 품질 게이트, Project/후속 Issue, PR·독립 리뷰·Reporter 기록·최종 head 확인·merge 후 절차를 Backend와 일치시킨다.
+- Java/Spring 구현·검증 기준을 현재 React 스택에 맞춘다.
+- issue-driven-dev만 유지하고 제거 대상 Skill의 활성 참조를 없앤다. 필요한 접근·백로그 전환 조건은 유지하는 Skill에 포함한다.
+- AGENTS, Skill, 역할 설정, README, 빠른 지시문, 리뷰 체크리스트, Issue·PR 템플릿의 공식 명세 참조를 네 문서로 통일한다.
+- 공식 명세와 실제 코드를 기준으로 중복 문서를 정리하고 미해결 계약 차이와 과거 원본 링크는 PR에 보존한다.
+- 임시 작업 기록과 이번 월 devlog를 작성한다. 기존 개발 이력과 이전 current-task 원문을 보존한다.
 
-- 조회 API는 React Query `useQuery`로 처리한다.
-- 게시글 작성/수정/삭제, 회원가입, 로그인 요청은 React Query `useMutation`으로 처리한다.
-- 게시글 작성/수정/삭제 성공 후 관련 게시글 query를 갱신한다.
-- 게시글 작성/수정 폼은 React Hook Form으로 입력값과 검증을 관리한다.
-- 게시글 요청/응답 데이터는 TypeScript 타입 정의를 기반으로 관리한다.
-- 기존 백엔드 API 원본 명세는 수정하지 않는다.
+## 제외 범위
 
-## 작업 브랜치
+- 제품 코드, 의존성·lockfile, 테스트·CI 환경, Backend API/DB/인증/인가 변경
+- Specs 원문 수정, 미결정 계약 확정, 기존 devlog 재작성
+- 제품 Issue 개발·추가 생성, PR merge 및 merge 전 브랜치 삭제
 
-- 기준 브랜치: `develop`
-- 작업 브랜치: `feature/issue-13-react-api-refactor`
-- PR 방향: `feature/issue-13-react-api-refactor` -> `develop`
+## 완료 조건과 검증
 
-## 이번 PR에서 할 일
-
-- [ ] React Query 기반 API 조회/변경 요청 구조 적용
-- [ ] 게시글 목록 조회를 `useQuery`로 변경
-- [ ] 게시글 상세 조회를 `useQuery`로 변경
-- [ ] 게시글 작성/수정/삭제를 `useMutation`으로 변경
-- [ ] 회원가입/로그인을 `useMutation`으로 변경
-- [ ] 게시글 작성/수정 성공 후 게시글 목록/상세 query 갱신
-- [ ] 게시글 삭제 성공 후 게시글 목록 query 갱신
-- [ ] 게시글 작성/수정 폼을 React Hook Form 기반으로 변경
-- [ ] 제목, 내용 등 필수 입력값 프론트 검증 유지
-- [ ] 게시글 API 요청/응답 TypeScript 타입 정의 추가
-- [ ] API 함수 반환 기준은 기존 문서 기준과 일치하도록 유지
-- [ ] `docs/requirements.md`에 React Query / React Hook Form / TypeScript 타입 기준 반영
-- [ ] `docs/api-usage.md`에 query key, mutation, invalidate, 타입 관리 기준 반영
-
-## 이번 PR에서 하지 않을 일
-
-- 백엔드 API 명세 원본 수정
-- 백엔드 API, DB, 인증/인가 구조 변경
-- JWT 저장, 전역 로그인 상태 관리, 권한 제어 구현
-- 댓글, 검색, 페이징, 좋아요, 파일 업로드 구현
-- 디자인 시스템 수준의 공통 UI 컴포넌트 도입
-- Issue #13 범위를 벗어난 화면/기능 개선
-
-## 완료 조건
-
-- [ ] 게시글 목록 조회가 React Query `useQuery`로 동작한다.
-- [ ] 게시글 상세 조회가 React Query `useQuery`로 동작한다.
-- [ ] 게시글 작성/수정/삭제가 React Query `useMutation`으로 동작한다.
-- [ ] 회원가입/로그인이 React Query `useMutation`으로 동작한다.
-- [ ] 게시글 작성/수정/삭제 성공 후 관련 게시글 데이터가 갱신된다.
-- [ ] 게시글 작성/수정 폼이 React Hook Form으로 입력값을 관리한다.
-- [ ] 제목, 내용 등 필수 입력값 검증 실패 시 API 요청을 보내지 않는다.
-- [ ] 게시글 API 요청/응답 타입이 TypeScript 타입으로 관리된다.
-- [ ] `npm run build`가 성공한다.
-- [ ] lint 명령이 있다면 `npm run lint`가 성공한다.
-- [ ] 브라우저 수동 확인에서 주요 API 요청/응답과 Console 에러 여부를 확인한다.
-
-## 확인 필요
-
-- 인증 API 경로는 `POST /api/auth/signup`, `POST /api/auth/login` 기준으로 구현한다.
+- 공식 Specs 네 경로·링크와 문서 참조를 확인한다.
+- Backend 절차와 대조해 기술 스택 및 사용자가 명시한 Skill 정리 차이만 남긴다.
+- TOML 구문·필수 역할 필드, Skill frontmatter와 실행 절차를 검증한다.
+- build/lint, git diff --check를 실행하고 실제 결과·미검증 사항을 기록한다.
+- 제품 코드·기존 devlog·과거 current-task 보존을 diff로 확인한다.
+- Architect 독립 리뷰 후 필요한 수정을 재검증하고 Reporter 기록을 반영한다.
+- 최종 head의 CI·필수 리뷰·보호 조건·충돌 여부를 확인해 develop 대상 PR 링크와 남은 문제를 보고한다.
 
 ## 예상 변경 파일
 
-### Architect 사전 반영 문서
-
-- `docs/requirements.md`
-- `docs/api-usage.md`
-- `docs/current-task.md`
-
-### Builder 구현 변경 예상 파일
-
-#### Page
-
-- `src/pages/PostListPage.*`
-- `src/pages/PostDetailPage.*`
-- `src/pages/PostCreatePage.*`
-- `src/pages/PostEditPage.*`
-- `src/pages/SignupPage.*`
-- `src/pages/LoginPage.*`
-
-#### Component
-
-- `src/components/PostForm.*`
-
-#### api
-
-- `src/api/postApi.*`
-- `src/api/authApi.*`
-- `src/api/postCategoryApi.*`
-- React Query 설정 파일 또는 query client 설정 위치
-
-#### utils
-
-- 게시글 validation 관련 파일
-- 게시글 요청/응답 TypeScript 타입 정의 파일
-- 공통 API 응답 TypeScript 타입 정의 파일
-
-#### CSS
-
-- 기존 페이지/폼 CSS 중 React Hook Form 에러 표시와 상태 표시 변경에 필요한 파일
-
-#### 기타
-
-- `package.json`
-- `package-lock.json` 또는 사용 중인 lockfile
-- 앱 루트의 React Query Provider 설정 파일
+- `AGENTS.md`, `README.md`, `.agents/skills/issue-driven-dev/SKILL.md`
+- `.codex/agents/architect.toml`, `.codex/agents/builder.toml`, `.codex/agents/reporter.toml`
+- `.github/ISSUE_TEMPLATE/feature_request.yml`, `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`
+- `docs/current-task.md`, `docs/current-work-log.md`, `docs/prompts/quick.md`, `docs/review-checklist.md`
+- 삭제: `docs/frontend-development.md`, `docs/spec-migration-review.md`, `docs/requirements.md`, `docs/api-usage.md`, `docs/archive/issue-13-current-task.md`
+- append-only: `docs/devlog/2026-11.md`
