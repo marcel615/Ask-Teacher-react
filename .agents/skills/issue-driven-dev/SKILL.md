@@ -101,7 +101,7 @@ description: 사용자의 작업 시작 지시에 따라 GitHub Issue를 선정�
 3. Architect는 설계, 요구사항·API·ERD·UI 변경 필요성, `current-task.md` 초안과 검증 계획을 제시한다. Main이 설계 게이트를 통과시키면 Architect가 승인 범위의 설계를 docs/current-task.md에 반영한다. 공통 명세는 Specs main을 기준으로 변경 필요성을 판단·보고하고 원문 대신 Issue 관련 요약과 원본 링크를 둔다.
 4. Builder는 구현·브랜치 계획을 제시한다. Main은 develop 최신 상태와 전환 가능 여부를 확인하고 feature 브랜치를 만든다. 기존 변경을 보존하고 충돌 또는 불확실성이 있으면 중단한다.
 5. 새 Issue 시작 시 이전 Issue의 devlog 반영을 확인한 뒤 `docs/current-work-log.md`를 초기화한다. 같은 Issue 재개 시 초기화하지 않는다. Builder는 주요 결정, 문제·해결, 예상과 다른 동작과 중요한 검증 결과만 기록한다.
-6. Builder는 Main이 승인한 범위에서 구현하고 필요한 자동 테스트와 전체 테스트를 실행한다. 변경 파일, 실행 명령·결과와 미검증 사항을 전달한다. Main은 구현 게이트 통과 후 commit·push하고 `feature/*` → `develop` PR을 생성한다.
+6. Builder는 Main이 승인한 범위에서 구현하고 설계한 관련 자동·기능 검증과 `npm run build`, `npm run lint`를 실행한다. 변경 파일, 실행 명령·결과와 미검증 사항을 전달한다. Main은 구현 게이트 통과 후 commit·push하고 `feature/*` → `develop` PR을 생성한다.
 7. Architect는 변경과 `docs/review-checklist.md`를 기준으로 필수 수정·선택 개선·통과 항목과 근거를 반환한다. Main은 리뷰 내용을 확인하고 PR에 일반 리뷰로 등록한다. AI 리뷰는 팀의 필수 사람 리뷰·승인을 대신하지 않는다.
 8. Builder는 필수 수정 사항을 반영하고 관련 검증을 다시 실행한다. 각 수정·재검증을 한 회로 하여 테스트·CI·필수 리뷰 문제에 대한 반복은 최대 2회다. 같은 문제가 남거나 범위·권한 변경이 필요하면 중단해 보고한다. 리뷰 수정 중의 주요 결정과 검증 결과도 기록한다.
 9. Main은 기술 후속 작업이 독립적으로 추적할 만큼 필요한 경우에만 위 기준에 따라 Issue를 생성하고 우선순위·확인된 선행 관계를 설정한다. 해당 작업이 없으면 Issue를 생성하지 않는다. 선택적 기능 후보는 Project Draft로 관리한다. Reporter는 Issue, PR, 임시 기록과 검증 결과를 근거로 devlog를 작성한다. Main은 확인 후 월별 파일에 append-only로 반영해 commit·push한다. 변경 후 관련 리뷰와 검증을 확인한다.
