@@ -10,6 +10,7 @@
 
 - [Backend PR #76](https://github.com/marcel615/Ask-Teacher/pull/76)의 최종 설정 구조를 참고하여 루트 `ai-dlc.yaml`에 Frontend 저장소, Project, 명세 및 React 검증 명령을 둔다.
 - AI-DLC 운영 파일의 프로젝트별 값을 설정 참조로 전환하고 단일 `issue-driven-dev` Skill, Main·Architect·Builder·Reporter 역할, 기존 Issue 절차와 승인 조건·품질 게이트를 유지한다.
+- 사용자 후속 요청으로 Skill, AGENTS와 리뷰 체크리스트에 남은 기술 버전·구현 경로·Issue 번호·테스트 도구 유무·개발 서버 주소를 점검하고, 실제 코드와 패키지·설정에서 확인하는 규칙으로 정리한다. React 개발 규칙과 승인·품질 게이트를 유지하고 불필요한 설정은 추가하지 않는다.
 - 제품 코드와 공식 Specs는 제외한다. 요구사항·API·ERD·UI 계약 변경은 필요하지 않다.
 - 설정과 템플릿의 YAML 파싱, 운영 파일의 설정 키와 공식 명세 경로 확인, `npm run build`, `npm run lint`, diff 확인 및 독립 리뷰를 수행한다. 화면·API 동작은 변경하지 않으므로 브라우저 Network·Console 통합 검증은 해당하지 않는다.
 - 설정과 운영 문서의 일치 및 검증 결과를 기록하고 `develop` 대상 PR을 생성한다. CI·필수 리뷰·충돌 및 보호 조건은 최종 head에서 확인한다.

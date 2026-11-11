@@ -23,7 +23,7 @@ description: 사용자의 작업 시작 지시에 따라 GitHub Issue를 선정�
 각 게이트는 통과·실패·보류를 구분하고 확인한 근거와 미검증 사항을 기록한다. 확인하지 못한 사항은 통과로 간주하지 않는다.
 
 - 설계: Issue의 목표·범위·제외 범위·완료 조건과 검증 방법이 명확하고 요구사항·API·ERD·UI 변경 필요성을 판단해야 한다. 기존 구조와 단순한 대안으로 요구사항을 충족할 수 있는지 검토하고, 새로운 추상화·설정·최적화·동시성 제어가 필요하면 이유와 대안을 제시한다. 미결정 요구사항, 범위 확장 또는 사용자 판단이 필요한 변경은 보류한다.
-- 구현: `current-task.md` 범위와 실제 diff가 일치하고 필요한 검증과 `development.build_command`, `development.lint_command`가 실제 통과해야 한다. 현재 자동 테스트 도구·test 스크립트는 없으므로 기능 변경의 관련 자동 검증 가능 여부와 화면·Network·Console 확인 범위를 설계하고, 실행 결과와 미검증 사항을 구분한다. 필요한 기능 검증을 실행하지 못하면 통과로 간주하지 않는다. Builder는 `AGENTS.md`의 가독성과 구성 기준을 변경 코드·테스트·설정·문서에 적용하고 Main은 diff에서 처리 흐름·책임과 불필요한 복잡성을 확인한다. 실행 실패·미실행, 범위 이탈 또는 미해결 문제는 통과가 아니다.
+- 구현: `current-task.md` 범위와 실제 diff가 일치하고 필요한 검증과 `development.build_command`, `development.lint_command`가 실제 통과해야 한다. `package.json`과 기존 테스트·설정을 확인해 사용 가능한 자동 테스트 도구와 명령을 파악하고, 기능 변경의 관련 자동 검증과 화면·Network·Console 확인 범위를 설계하며 실행 결과와 미검증 사항을 구분한다. 필요한 기능 검증을 실행하지 못하면 통과로 간주하지 않는다. Builder는 `AGENTS.md`의 가독성과 구성 기준을 변경 코드·테스트·설정·문서에 적용하고 Main은 diff에서 처리 흐름·책임과 불필요한 복잡성을 확인한다. 실행 실패·미실행, 범위 이탈 또는 미해결 문제는 통과가 아니다.
 - 리뷰·기록: Architect는 `AGENTS.md`와 `docs/review-checklist.md`를 기준으로 설계 의도와 실제 변경을 독립적으로 확인하고, 처리 흐름과 테스트 의도를 이해할 수 있는지 검토한다. 필수 수정 사항을 해결하고 관련 변경을 재검증하며 해당 Issue devlog를 반영해야 한다.
 - 머지 준비: 마지막 push의 정확한 head commit에 대해 필요한 CI 성공, 필수 리뷰·브랜치 보호 조건, 충돌 없음, devlog 반영 및 미해결 필수 지적 없음을 확인한다. 대기·실패·미실행·확인 불가이면 준비 완료로 보고하지 않는다. head가 바뀌면 해당 head 기준으로 다시 확인한다.
 
@@ -119,8 +119,8 @@ description: 사용자의 작업 시작 지시에 따라 GitHub Issue를 선정�
 
 ## React 구현 기준
 
-- 현재 스택은 React 19, Vite 8, React Router 7, Axios, React Query 5, React Hook Form 7, CSS다. JSX/JavaScript에 JSDoc과 `src/types/apiTypes.d.ts`를 사용하며 전체 TypeScript 전환은 별도 Issue #20이다.
-- 조회는 `useQuery`, 사용자 변경 요청은 `useMutation`과 이벤트 핸들러로 관리한다. query key·무효화·삭제 캐시 정리는 `src/api/queryKeys.js`와 현재 구현을 확인한다.
-- 공식 API 응답·인증 계약을 우선 확인한다. 기존 `response.data.data`와 `ApiResponse`는 현재 남은 과거 구현이며 신규 계약의 규칙으로 일반화하지 않는다. 기존 불일치는 범위 밖에서 임의 수정하지 않고 보고한다.
+- `package.json`, lockfile과 현재 코드를 확인해 스택·버전과 언어·타입 패턴을 파악하고 기존 구조를 따른다.
+- 조회는 `useQuery`, 사용자 변경 요청은 `useMutation`과 이벤트 핸들러로 관리한다. query key·무효화·삭제 캐시 정리는 관련 코드와 현재 구현을 확인한다.
+- 공식 API 응답·인증 계약을 우선 확인한다. 기존 응답 처리와 타입을 실제 코드에서 확인하되 공식 계약의 규칙으로 일반화하지 않는다. 기존 불일치는 범위 밖에서 임의 수정하지 않고 보고한다.
 - React Hook Form 검증 실패 시 요청을 보내지 않고 오류 시 입력을 유지한다. 조회·mutation의 로딩/실패/빈 상태와 중복 제출 방지를 확인한다. 에러 응답 메시지를 우선 사용하고 서버 응답이 없으면 기본 메시지를 사용한다.
-- API 함수는 `src/api`에 두고 기존 Page·Component·CSS 구조를 따른다. 사용하지 않는 import와 불필요한 console.log를 추가하지 않는다.
+- API 함수의 위치와 기존 Page·Component·CSS 구조를 실제 코드에서 확인하고 따른다. 사용하지 않는 import와 불필요한 console.log를 추가하지 않는다.

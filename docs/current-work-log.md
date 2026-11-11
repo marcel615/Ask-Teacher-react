@@ -5,3 +5,6 @@
 - Backend PR #76의 최종 schema version 2 설정을 참고하여 Frontend 저장소·UI 계약·빌드/린트 명령을 추가하고 운영 파일이 활성 서비스 설정을 참조하게 했다. 기존 단일 Skill과 역할·승인·품질 게이트를 유지한다.
 - `npm run build`, `npm run lint`, `git diff --check` 통과. SnakeYAML 2.4로 `ai-dlc.yaml`과 Issue 템플릿을 파싱하고 운영 파일에서 추출한 설정 키 29개가 활성 서비스에 존재함을 확인했다.
 - 제품 동작이나 API 연결 변경이 없어 브라우저 Network·Console 검증은 해당하지 않는다. 공식 Specs 네 경로를 조회했고 Architect 독립 리뷰의 현재 작업 문서 지적을 반영했다. PR 및 최종 head 조건 확인은 진행 중이다.
+
+- 사용자 후속 요청으로 Skill·AGENTS·리뷰 체크리스트의 기술 버전, 구현 경로·응답 형태, Issue 번호, 테스트 도구 유무와 개발 서버 주소를 실제 패키지·코드·설정 확인 규칙으로 정리했다. React 개발 규칙과 기존 검증·승인 게이트를 유지하고 새 설정은 추가하지 않았다.
+- 후속 변경 검증: `npm run build`, `npm run lint`, `git diff --check` 통과. 대상 문서에서 해당 고정값 검색 결과 없음. 문서만 변경해 화면·Network·Console 검증은 해당하지 않는다.
