@@ -8,13 +8,13 @@
 
 ## PR 방향
 
-- base: `develop`
-- compare: `feature/*`
+- base: `ai-dlc.yaml`의 `repositories.frontend.default_branch`
+- compare: `ai-dlc.yaml`의 `development.branch_pattern`
 
 ## 테스트 결과
 
-- [ ] npm run build 통과
-- [ ] npm run lint 통과
+- [ ] `development.build_command` 통과
+- [ ] `development.lint_command` 통과
 - [ ] 변경 API·Page·Component 및 주요 사용자 흐름 검증
 - [ ] 테스트 계정·인증 정보·API 대상·파일 격리 확인
 - 테스트 범위 / 실행 결과:
@@ -32,8 +32,8 @@
 ## 체크리스트
 
 - [ ] docs/current-task.md 범위 안에서 작업했다.
-- [ ] 작업 브랜치가 feature/*이며 PR base는 develop이다.
-- [ ] Specs main의 [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md)와 관련 변경이 일치한다.
+- [ ] 작업 브랜치와 PR base가 설정된 브랜치 규칙을 따른다.
+- [ ] `ai-dlc.yaml`의 활성 서비스 `requirements`, `contracts.api`, `contracts.erd`, `contracts.ui`가 지정한 공식 원본과 관련 변경이 일치한다.
 - [ ] 요청·응답 타입과 UI 입력값, API·Component 책임을 구분했다.
 - [ ] 입력 검증·상태·오류·캐시 갱신·라우팅·권한을 확인했다.
 - [ ] 실제 검증 결과와 미검증 사항을 구분했다.

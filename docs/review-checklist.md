@@ -3,7 +3,7 @@
 ## 작업 범위
 
 - [ ] docs/current-task.md 범위 안이며 불필요한 변경이 없는가?
-- [ ] feature/* → develop 방향이며 기준 브랜치에 직접 구현하지 않았는가?
+- [ ] 설정된 작업 브랜치 → Frontend 기준 브랜치 방향이며 기준 브랜치에 직접 구현하지 않았는가?
 
 ## Frontend 구조·가독성
 
@@ -16,12 +16,12 @@
 
 ## 공식 설계·API·UI
 
-공식 원본: [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md).
+공식 원본: `ai-dlc.yaml`의 활성 서비스 `requirements`, `contracts.api`, `contracts.erd`, `contracts.ui`와 각각의 `repository_role`.
 
 - [ ] 변경한 기능·화면 동작·라우트가 공식 요구사항/UI 및 승인된 Issue와 일치하는가?
 - [ ] Method·URL·Payload·응답·인증/권한이 API 계약과 일치하는가?
 - [ ] ERD 식별자·관계와 API/UI 타입을 혼동하지 않는가?
-- [ ] 기존 ApiResponse·response.data.data를 현재 공식 계약으로 가정하지 않고 불일치를 보고했는가?
+- [ ] 기존 응답 처리와 타입을 공식 계약으로 가정하지 않고 불일치를 보고했는가?
 - [ ] API 오류 메시지와 응답이 없을 때의 기본 메시지를 처리하는가?
 - [ ] API 함수·사용 위치·키·무효화 정책이 실제 코드와 공식 계약에 일치하는가?
 
@@ -37,8 +37,8 @@
 
 ## 검증·기록
 
-- [ ] npm run build와 npm run lint를 실제 실행했는가?
-- [ ] 변경 API 함수·화면·컴포넌트 및 사용자 흐름에 필요한 자동/통합 검증을 작성·보완했는가? 현재 자동 도구가 없는 경우 그 한계와 대체 확인을 구분했는가?
+- [ ] `development.build_command`와 `development.lint_command`를 실제 실행했는가?
+- [ ] 변경 API 함수·화면·컴포넌트 및 사용자 흐름에 필요한 자동/통합 검증을 작성·보완했는가? 사용 가능한 도구를 확인하고 자동 도구가 없는 경우 그 한계와 대체 확인을 구분했는가?
 - [ ] 정상·실패·빈 상태·검증 실패·캐시 갱신·인증/권한 흐름을 확인했는가?
 - [ ] 테스트 계정·API 대상·파일이 개발/운영 데이터와 격리되고 실행 순서나 고정 기존 데이터에 의존하지 않는가?
 - [ ] 관련 화면은 Backend와 개발 서버를 실행해 Network Payload/Response·Console을 확인했는가?
