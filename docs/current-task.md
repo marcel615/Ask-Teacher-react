@@ -1,54 +1,15 @@
-# Current Task
+# 현재 작업: Frontend AI-DLC 프로젝트별 설정 분리
 
-## 요청과 승인 근거
+## 승인과 기준
 
-- [Issue #22: Frontend AI-DLC 워크플로우 및 공식 명세 참조 개편](https://github.com/marcel615/Ask-Teacher-react/issues/22)
-- 2026-11-10 사용자 요청에 따라 이번 문서·설정 정비와 develop 대상 단일 PR까지 진행한다. Main은 Issue #22의 선행 관계 없음·미결정 라벨 없음과 Project의 Ready 상태를 확인한 후 In Progress로 전환했다.
-- 이전 Issue #13은 [PR #19](https://github.com/marcel615/Ask-Teacher-react/pull/19)의 merge(2026-06-10, `31efac3c9191d91ac73c64471e68e19e0f5e3b5f`)와 기존 2026-06 devlog 반영을 Main이 확인했다. 이전 current-task 원문은 [기준 커밋](https://github.com/marcel615/Ask-Teacher-react/blob/31efac3c9191d91ac73c64471e68e19e0f5e3b5f/docs/current-task.md)에서 확인한다.
-- 한 번에 Issue #22만 진행하며 Main의 품질 게이트와 Backend의 일반 Issue 기반 절차를 따른다.
+- 사용자 요청으로 Issue를 생성하거나 연결하지 않고 이 작업을 진행한다. 제품 코드와 공식 Specs는 수정하지 않으며 PR merge는 사용자가 직접 한다.
+- 기준: Frontend `develop`의 `adbac9b8597acbf761ec7ef1d0f54876b165eaf9`, 작업 브랜치 `feature/ai-dlc-project-config`.
+- 이전 Issue #22는 PR #23 merge 및 devlog 반영을 Main이 확인했다. 이전 작업 설계와 기록은 [기준 커밋의 current-task.md](https://github.com/marcel615/Ask-Teacher-react/blob/adbac9b8597acbf761ec7ef1d0f54876b165eaf9/docs/current-task.md)와 [current-work-log.md](https://github.com/marcel615/Ask-Teacher-react/blob/adbac9b8597acbf761ec7ef1d0f54876b165eaf9/docs/current-work-log.md)에서 확인한다.
 
-## 참조
+## 범위와 완료 조건
 
-- Backend develop: `61cd8c5e3cf9bc239e14cef7c5e0bb6dab632b1d`의 AGENTS, Skill, 역할 설정과 개발 문서.
-- Specs main 확인 SHA: `3b30bbd23cad618a6a16b022dbd03c7f2d1fc69f`. 공식 원본: [요구사항](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/requirements.md), [API 및 인증 계약](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/api-spec.md), [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/erd.md), [UI 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/ui-spec.md).
-- 차이·보존 근거: [PR #23](https://github.com/marcel615/Ask-Teacher-react/pull/23).
-
-## 브랜치와 PR
-
-- 기준: develop `31efac3c9191d91ac73c64471e68e19e0f5e3b5f`
-- 작업: `feature/issue-22-ai-dlc-workflow`
-- PR: `feature/issue-22-ai-dlc-workflow` → `develop`, 하나만 생성. Merge는 사용자 직접 수행.
-
-## 범위
-
-- Main·Architect·Builder·Reporter 역할, 순차 실행, 승인 경계, 품질 게이트, Project/후속 Issue, PR·독립 리뷰·Reporter 기록·최종 head 확인·merge 후 절차를 Backend와 일치시킨다.
-- Java/Spring 구현·검증 기준을 현재 React 스택에 맞춘다.
-- issue-driven-dev만 유지하고 제거 대상 Skill의 활성 참조를 없앤다. 필요한 접근·백로그 전환 조건은 유지하는 Skill에 포함한다.
-- AGENTS, Skill, 역할 설정, README, 빠른 지시문, 리뷰 체크리스트, Issue·PR 템플릿의 공식 명세 참조를 네 문서로 통일한다.
-- 공식 명세와 실제 코드를 기준으로 중복 문서를 정리하고 미해결 계약 차이와 과거 원본 링크는 PR에 보존한다.
-- 임시 작업 기록과 이번 월 devlog를 작성한다. 기존 개발 이력과 이전 current-task 원문을 보존한다.
-
-## 제외 범위
-
-- 제품 코드, 의존성·lockfile, 테스트·CI 환경, Backend API/DB/인증/인가 변경
-- Specs 원문 수정, 미결정 계약 확정, 기존 devlog 재작성
-- 제품 Issue 개발·추가 생성, PR merge 및 merge 전 브랜치 삭제
-
-## 완료 조건과 검증
-
-- 공식 Specs 네 경로·링크와 문서 참조를 확인한다.
-- Backend 절차와 대조해 기술 스택 및 사용자가 명시한 Skill 정리 차이만 남긴다.
-- TOML 구문·필수 역할 필드, Skill frontmatter와 실행 절차를 검증한다.
-- build/lint, git diff --check를 실행하고 실제 결과·미검증 사항을 기록한다.
-- 제품 코드·기존 devlog·과거 current-task 보존을 diff로 확인한다.
-- Architect 독립 리뷰 후 필요한 수정을 재검증하고 Reporter 기록을 반영한다.
-- 최종 head의 CI·필수 리뷰·보호 조건·충돌 여부를 확인해 develop 대상 PR 링크와 남은 문제를 보고한다.
-
-## 예상 변경 파일
-
-- `AGENTS.md`, `README.md`, `.agents/skills/issue-driven-dev/SKILL.md`
-- `.codex/agents/architect.toml`, `.codex/agents/builder.toml`, `.codex/agents/reporter.toml`
-- `.github/ISSUE_TEMPLATE/feature_request.yml`, `.github/PULL_REQUEST_TEMPLATE/pull_request_template.md`
-- `docs/current-task.md`, `docs/current-work-log.md`, `docs/prompts/quick.md`, `docs/review-checklist.md`
-- 삭제: `docs/frontend-development.md`, `docs/spec-migration-review.md`, `docs/requirements.md`, `docs/api-usage.md`, `docs/archive/issue-13-current-task.md`
-- append-only: `docs/devlog/2026-11.md`
+- [Backend PR #76](https://github.com/marcel615/Ask-Teacher/pull/76)의 최종 설정 구조를 참고하여 루트 `ai-dlc.yaml`에 Frontend 저장소, Project, 명세 및 React 검증 명령을 둔다.
+- AI-DLC 운영 파일의 프로젝트별 값을 설정 참조로 전환하고 단일 `issue-driven-dev` Skill, Main·Architect·Builder·Reporter 역할, 기존 Issue 절차와 승인 조건·품질 게이트를 유지한다.
+- 제품 코드와 공식 Specs는 제외한다. 요구사항·API·ERD·UI 계약 변경은 필요하지 않다.
+- 설정과 템플릿의 YAML 파싱, 운영 파일의 설정 키와 공식 명세 경로 확인, `npm run build`, `npm run lint`, diff 확인 및 독립 리뷰를 수행한다. 화면·API 동작은 변경하지 않으므로 브라우저 Network·Console 통합 검증은 해당하지 않는다.
+- 설정과 운영 문서의 일치 및 검증 결과를 기록하고 `develop` 대상 PR을 생성한다. CI·필수 리뷰·충돌 및 보호 조건은 최종 head에서 확인한다.
