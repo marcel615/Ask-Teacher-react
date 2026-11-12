@@ -173,11 +173,13 @@ npm run lint
 불명확한 요구, 범위 확대, DB·인증/인가·비밀값·중요설정 변경, 위험 작업이나 필수 승인이 필요하면 해당 작업을 멈추고 확인합니다. 정해진 수정 한도 내 실패를 해결하지 못하거나 근거·권한을 확인할 수 없어도 중단·보고합니다.
 
 - [ai-dlc.yaml](ai-dlc.yaml): 활성 서비스의 저장소, Project, 명세와 개발 설정
-- [AGENTS.md](AGENTS.md), [유일한 개발 Skill](.agents/skills/issue-driven-dev/SKILL.md), [역할 설정](.codex/agents/)
-- [현재 작업](docs/current-task.md), [임시 작업 기록](docs/current-work-log.md), [devlog](docs/devlog/), [빠른 지시문](docs/prompts/quick.md), [리뷰 기준](docs/review-checklist.md)
+- 공통 운영 규칙, 개발 Skill, 역할 설정, 빠른 지시문과 리뷰 기준: [Frontend AI-DLC 공통 저장소](https://github.com/marcel615/ai-dlc-frontend)
+- [현재 작업](docs/current-task.md), [임시 작업 기록](docs/current-work-log.md), [devlog](docs/devlog/)
 - 설정의 `project.url`이 가리키는 GitHub Project: 승인·우선순위·상태 기준은 Skill을 따릅니다. 실제 자동 상태 전환은 통합 검증 전까지 확인된 것으로 간주하지 않습니다.
 
 별도 기능 탐색·백로그 Skill은 유지하지 않습니다. 개발 중 후보·기술 후속 작업과 사용자 지시의 승인된 백로그 전환 조건은 issue-driven-dev에 포함합니다. 현재 이 저장소에는 CI workflow가 없으며, 개별 실행에서 실제 검증·필수 조건을 확인해야 합니다.
+
+AI-DLC 작업은 공통 저장소를 연 Codex 세션에서 시작합니다. 공통 저장소의 `projects.local.yaml`에 이 프로젝트를 등록한 뒤 `Ask-Teacher 프로젝트 작업 시작하자`라고 요청합니다. 프로젝트 설정과 작업 기록은 이 저장소에서 유지합니다. 공통 Skill·역할의 새 세션 자동 인식은 실행 환경에서 확인해야 합니다.
 
 ## 트러블슈팅
 
