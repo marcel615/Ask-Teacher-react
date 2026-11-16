@@ -62,12 +62,16 @@ services:
     contracts:
       api:
         repository_role: common
-        path: docs/api-spec.md
+        path: docs/openapi.yaml
+        format: openapi
+      authentication:
+        repository_role: common
+        path: docs/auth-policy.md
         format: markdown
       erd:
         repository_role: common
-        path: docs/erd.md
-        format: markdown
+        path: docs/schema.dbml
+        format: dbml
       ui:
         repository_role: common
         path: docs/ui-spec.md
