@@ -95,7 +95,11 @@ API 기능은 도메인별 파일로 분리했습니다.
 
 현재 프론트 코드에는 과거 `ApiResponse` 계약에 따른 조회 `response.data.data`, 변경·인증 `response.data` 처리가 남아 있습니다. 공식 API 명세는 성공 DTO·목록 직접 반환과 본문 없는 성공 응답을 정의하므로, 이 차이를 신규 구현 규칙으로 사용하지 않습니다. 제품 코드 변경은 이번 문서 정비의 범위가 아닙니다.
 
-공식 명세 원본은 `ai-dlc.yaml`의 활성 서비스 `requirements`, `contracts.api`, `contracts.erd`, `contracts.ui`와 각각의 `repository_role`을 따라 확인합니다.
+공식 명세 원본은 `ai-dlc.yaml`의 활성 서비스와 각 `repository_role`을 따라 확인합니다.
+
+- [API 명세](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/openapi.yaml)
+- [인증·세션 정책](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/auth-policy.md)
+- [ERD](https://github.com/marcel615/Ask-Teacher-specs/blob/main/docs/schema.dbml)
 
 ## ERD
 
