@@ -18,6 +18,30 @@ services:
         repository: marcel615/Ask-Teacher-spring
         default_branch: develop
 
+    work_tracking:
+      provider: jira
+
+    jira:
+      site_url: https://marcel615.atlassian.net
+      project_key: ASK
+      issue_types:
+        candidate: 작업
+        implementation: 작업
+        epic: 에픽
+        contract: 작업
+      statuses:
+        candidate: 아이디어 후보
+        backlog: 할 일
+        ready: 착수 가능
+        in_progress: 진행 중
+        in_review: 검토 중
+        done: 완료
+      role_labels:
+        backend: 'area:backend'
+        frontend: 'area:frontend'
+      approval: user_transition_to_backlog
+      priority_order: [Highest, High, Medium, Low, Lowest]
+
     project:
       owner: marcel615
       number: 1
@@ -87,5 +111,5 @@ services:
       lint_command: 'npm run lint'
 
 # 명세는 해당 repository_role의 default_branch에서 조회하며 원문을 복사하지 않는다.
-# Project 필드·선택지와 라벨은 사용 전 실제 GitHub 값과 대조한다.
+# 선택한 작업 추적 도구의 유형·상태·권한과 필요한 라벨은 사용 전 실제 값과 대조한다.
 # 토큰과 인증 정보는 기록하지 않는다.
