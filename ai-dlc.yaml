@@ -1,4 +1,4 @@
-# 프로젝트 연결 데이터다. 작업 범위와 결정 권한은 AGENTS.md를 따른다.
+# 프로젝트 연결 데이터다. 작업 범위와 결정 권한은 공통 운영 루트 ai-dlc의 AGENTS.md를 따른다.
 schema_version: 2
 active_service: askteacher
 
