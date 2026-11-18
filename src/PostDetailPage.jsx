@@ -1,69 +1,55 @@
-import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
 import { deletePost, getPost } from './api/postApi'
 import { postKeys } from './api/queryKeys'
+import { authSession } from './auth/authSession.js'
+import { useAuth } from './auth/useAuth.js'
+import { SessionStatus } from './auth/AuthBoundary.jsx'
+import { errorMessage } from './auth/session.js'
 import './PostDetailPage.css'
 
-const formatDateTime = dateTime => {
-    if (!dateTime) {
-        return ''
-    }
-
-    return dateTime.replace('T', ' ').slice(0, 16)
-}
+const formatDateTime = dateTime => dateTime ? dateTime.replace('T', ' ').slice(0, 16) : ''
 
 function PostDetailPage() {
     const { postId } = useParams()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const [deleteError, setDeleteError] = useState(null)
-
-    const {
-        data: post,
-        isLoading,
-        error
-    } = useQuery({
-        queryKey: postKeys.detail(postId),
-        queryFn: () => getPost(postId),
-        enabled: Boolean(postId)
+    const auth = useAuth()
+    const postQuery = useQuery({
+        queryKey: postKeys.detail(postId, auth.generation),
+        queryFn: ({ signal }) => getPost(postId, signal),
+        enabled: Boolean(postId) && auth.status !== 'checking' && auth.status !== 'error',
+        retry: false
     })
-
     const deleteMutation = useMutation({
-        mutationFn: () => deletePost(postId),
-        onSuccess: async () => {
-            queryClient.removeQueries({ queryKey: postKeys.detail(postId) })
-            await queryClient.invalidateQueries({ queryKey: postKeys.all })
-            navigate('/posts', { replace: true })
+        mutationFn: async () => {
+            await deletePost(postId)
+            return auth.generation
         },
-        onError: error => {
-            setDeleteError(error.response?.data?.message ?? '게시글 삭제에 실패했습니다.')
+        onSuccess: async generation => {
+            if (!authSession.isCurrent(generation)) return
+            queryClient.removeQueries({ queryKey: postKeys.details })
+            await queryClient.invalidateQueries({ queryKey: postKeys.all })
+            if (authSession.isCurrent(generation)) navigate('/posts', { replace: true })
         }
     })
-
     const handleDelete = () => {
-        if (deleteMutation.isPending) {
-            return
-        }
-
-        const confirmed = window.confirm('게시글을 삭제하시겠습니까?')
-        if (!confirmed) {
-            return
-        }
-
-        setDeleteError(null)
-        deleteMutation.mutate()
+        if (deleteMutation.isPending || postQuery.isFetching || postQuery.data?.isAuthor !== true) return
+        if (window.confirm('게시글을 삭제하시겠습니까?')) deleteMutation.mutate()
     }
-
-    if (isLoading) {
-        return <div className="post-detail-page">로딩 중...</div>
+    if (auth.status === 'checking' || auth.status === 'error') return <SessionStatus />
+    if (postQuery.isPending) return <p role="status">로딩 중...</p>
+    if (postQuery.error) {
+        return (
+            <div className="post-detail-page" role="alert">
+                <p>{errorMessage(postQuery.error, '게시글 상세 조회에 실패했습니다.')}</p>
+                <button onClick={() => void postQuery.refetch()}>다시 시도</button>
+            </div>
+        )
     }
-
-    if (error) {
-        const message = error.response?.data?.message ?? '게시글 상세 조회에 실패했습니다.'
-        return <div className="post-detail-page">{message}</div>
-    }
-
+    const post = postQuery.data
+    if (!post) return <p>게시글이 없습니다.</p>
+    const canManage = auth.status === 'authenticated' && !postQuery.isFetching && post.isAuthor === true
     return (
         <div className="post-detail-page">
             <div className="post-detail-meta">
@@ -72,25 +58,27 @@ function PostDetailPage() {
             </div>
             <h3 className="post-detail-title">{post.title}</h3>
             <p className="post-detail-content">{post.content}</p>
-            {deleteError && (
-                <p className="post-detail-error">{deleteError}</p>
+            {deleteMutation.error && (
+                <p role="alert">{errorMessage(deleteMutation.error, '게시글 삭제에 실패했습니다.')}</p>
             )}
-            <div className="post-detail-actions">
-                <button
-                    className="post-detail-edit-button"
-                    disabled={deleteMutation.isPending}
-                    onClick={() => navigate(`/posts/${post.postId ?? post.id ?? postId}/edit`)}
-                >
-                    수정
-                </button>
-                <button
-                    className="post-detail-delete-button"
-                    disabled={deleteMutation.isPending}
-                    onClick={handleDelete}
-                >
-                    {deleteMutation.isPending ? '삭제 중...' : '삭제'}
-                </button>
-            </div>
+            {canManage && (
+                <div className="post-detail-actions">
+                    <button
+                        className="post-detail-edit-button"
+                        disabled={deleteMutation.isPending}
+                        onClick={() => navigate(`/posts/${postId}/edit`)}
+                    >
+                        수정
+                    </button>
+                    <button
+                        className="post-detail-delete-button"
+                        disabled={deleteMutation.isPending}
+                        onClick={handleDelete}
+                    >
+                        {deleteMutation.isPending ? '삭제 중...' : '삭제'}
+                    </button>
+                </div>
+            )}
         </div>
     )
 }

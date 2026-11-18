@@ -1,10 +1,19 @@
-# 현재 작업 기록
+# 현재 작업 기록: ASK-14
 
-- 사용자 요청에 따라 Issue 생성·연결 없이 Frontend AI-DLC 프로젝트별 설정을 분리한다. 제품 코드와 공식 Specs 변경은 제외하며 merge는 사용자가 수행한다.
-- Main은 기존 #22 devlog 반영 및 PR #23 merge를 확인했다. 이전 설계·기록은 기준 커밋 `adbac9b8597acbf761ec7ef1d0f54876b165eaf9`에 보존된다.
-- Backend PR #76의 최종 schema version 2 설정을 참고하여 Frontend 저장소·UI 계약·빌드/린트 명령을 추가하고 운영 파일이 활성 서비스 설정을 참조하게 했다. 기존 단일 Skill과 역할·승인·품질 게이트를 유지한다.
-- `npm run build`, `npm run lint`, `git diff --check` 통과. SnakeYAML 2.4로 `ai-dlc.yaml`과 Issue 템플릿을 파싱하고 운영 파일에서 추출한 설정 키 29개가 활성 서비스에 존재함을 확인했다.
-- 제품 동작이나 API 연결 변경이 없어 브라우저 Network·Console 검증은 해당하지 않는다. 공식 Specs 네 경로를 조회했고 Architect 독립 리뷰의 현재 작업 문서 지적을 반영했다. PR 및 최종 head 조건 확인은 진행 중이다.
-
-- 사용자 후속 요청으로 Skill·AGENTS·리뷰 체크리스트의 기술 버전, 구현 경로·응답 형태, Issue 번호, 테스트 도구 유무와 개발 서버 주소를 실제 패키지·코드·설정 확인 규칙으로 정리했다. React 개발 규칙과 기존 검증·승인 게이트를 유지하고 새 설정은 추가하지 않았다.
-- 후속 변경 검증: `npm run build`, `npm run lint`, `git diff --check` 통과. 대상 문서에서 해당 고정값 검색 결과 없음. 문서만 변경해 화면·Network·Console 검증은 해당하지 않는다.
+- 작업: [ASK-14 — 프론트엔드 인증 연동 및 로그인 상태 관리](https://marcel615.atlassian.net/browse/ASK-14). 사용자의 2026-11-18 18:14 KST ‘착수 가능’ 전환을 Main이 확인하고, ‘진행 중’ 전환과 재조회를 완료했다. 이전 기록은 [기준 커밋](https://github.com/marcel615/Ask-Teacher-react/blob/e506e3d5bb7a9569564e9cb82dbc583f0b2c114e/docs/current-work-log.md)에 보존된다.
+- 기준: Frontend `develop` `e506e3d5bb7a9569564e9cb82dbc583f0b2c114e`, 작업 브랜치 `feature/issue-14-frontend-auth`. 등록 경로·Git root·fetch/push origin 일치 및 clean 상태, 열린 PR 없음을 Main이 확인했다.
+- 공식 기준: Specs `main` `bb06abd9d2557a37ca19ae1bde3bc1b23f878357`의 요구사항·API·인증·ERD·UI. Specs PR #12 실제 병합 및 작성자 표시 계약 반영을 확인했다. 공식 계약·운영 파일·Backend는 수정하지 않는다.
+- Architect 설계와 Main 설계 게이트 통과. 메모리 인증/입력, CSRF와 세션 복구, 탭 간 쿠키 변경 직렬화, 인증 상태별 상세 캐시와 작성자 표시, multipart/flat 응답 정리를 수행한다. JWT subject는 입력 계정 분리용이며 인가 판단에 사용하지 않는다.
+- 작업 전 `npm run build`, `npm run lint` 통과. 구현 초안에서도 두 명령이 통과했다. 빌드/린트는 기능·전체 타입 검사를 대신하지 않는다.
+- 실제 Backend ASK-16은 미완료이며, Main 읽기 전용 확인에서 Backend `develop` `457d8fecad180b8610523fb8a2e5d99baec7eed8`에 `isAuthor` 제공 코드와 localhost:8080 서버가 없다. 타 프로젝트 Redis는 사용하지 않는다. 실제 연동과 최종 구현/머지 준비 게이트는 보류한다.
+- Main의 브라우저 검증은 IAB localhost 타임아웃 및 native Chrome URL 확인 제한으로 중단됐다. 실제 화면·Network·Console은 미검증이며 모의 API/자동 테스트를 실제 서버 연동 성공으로 보고하지 않는다.
+- 인증 구현: 세션 모듈에서 Web Locks로 CSRF 획득부터 로그인·재발급·로그아웃 후 재획득까지 직렬화한다. 진행 중 복구 Promise를 공유하고 BroadcastChannel로 현재 토큰을 일시 전달하되 localStorage에는 비밀 없는 버전·상태만 남긴다. 통신 실패·재발급 응답 유실은 자동 회전을 중단한다. 다른 탭의 선행 재발급이 명시적 로그아웃을 취소하지 못하게 하며 인증 세대가 바뀐 요청·화면 콜백을 차단한다.
+- 화면/API: 보호 라우트·헤더·로그인·로그아웃·세션 오류/수동 재시도, 현재 `isAuthor`에 따른 수정/삭제와 직접 수정 URL, 인증 세대별 상세 key/취소·제거, 메모리 입력의 동일 계정 복원·폐기, multipart와 flat DTO/page content/category 배열을 반영했다. 새 첨부·검색/페이징 UI·소셜 로그인은 추가하지 않았다.
+- 자동 검증: `node --test tests/auth-session.test.mjs` 13/13 통과. CSRF credential·순서, Bearer/multipart, single-flight, 두 탭 직렬화·로그아웃·재발급 유실 중단, 403 수동 재시도, 503와 로그아웃 실패, 복구 중 로그아웃·이전 계정 응답 차단, 입력 계정 분리·폐기, 공개 상세 fallback, 조정 미지원 및 공식 응답 파싱을 격리된 모의 전송/브라우저로 검증했다. 실제 Chrome/서버 검증은 아니다.
+- Architect 독립 리뷰 수정 1회: 늦게 도착한 만료 토큰의 401은 이미 갱신된 같은 계정/세대의 토큰을 사용해 원요청을 한 번만 재시도한다. 로그아웃 204 및 로그인·복구 200의 확정 성공을 후속 CSRF 재획득 실패와 분리하고, 로그아웃은 먼저 로컬/다른 탭에 비로그인·입력 폐기를 확정한다. CSRF 후처리 실패는 별도 안내하며 다음 명시적 인증 요청에서 재획득한다. 동일 계정 원격 로그인도 상세 세대를 갱신한다.
+- 수정 검증: 토큰별 만료 및 지연 401, 로그아웃 204 뒤 CSRF 503/네트워크 실패의 두 탭 상태·입력 정리, 로그인/재발급 200 뒤 후처리 실패, BroadcastChannel 우선 후 storage 통지의 동일 계정 로그인, 오류 메시지 fallback을 추가해 Node 자동 검증 20/20 통과. README 제한 사항과 상세/수정 화면 가독성도 정리했다.
+- 자동 검증 한계: 탭 통신·storage 순서는 모의 환경에서 지정한 경우만 확인했다. 실제 브라우저 이벤트 순서 전체와 React 화면의 Query 취소·재조회·입력 복원은 검증하지 않았으며, 실제 Backend 연동 및 화면/Network/Console 게이트는 계속 보류한다.
+- Architect/Main 검토 수정 2회(마지막): 명시적 로그아웃이 재발급 잠금을 기다리는 동안 과거 재발급의 401·503·응답 유실이 현재 revision을 다시 바꾸어 로그아웃을 취소하지 않도록 오류 처리에도 세대 검사를 적용했다. 회전 결과가 불명확하면 공유 중단 상태는 전파하되 현재 명시적 동작의 revision을 변경하지 않는다.
+- 회귀 검증: 지연된 재발급 401·503·네트워크 실패 각각에서 대기한 로그아웃이 서버에 한 번 전송되고 두 탭의 토큰이 제거되는지 추가 확인했다. `node --test tests/auth-session.test.mjs` 23/23, `npm run lint`, `npm run build`, `git diff --check` 통과. 실제 Backend·Chrome 화면/Network/Console 검증은 계속 보류한다.
+- Main 최종 확인: 수정 2회 뒤 Architect 관련 재리뷰의 필수 지적 해소, Node 23/23 및 diff 검사 통과. Reporter의 승인된 devlog를 2026-11.md에 append-only로 반영했다. Jira ASK-14 진행 중 / ASK-16 착수 가능 및 Backend 기준 SHA·isAuthor 미제공·서버 미실행을 다시 확인했다. 실제 연동·화면 검증이 남아 구현 게이트 보류, commit·push·PR 없음. 작업 브랜치의 변경을 보존하며 ASK-16 제공과 브라우저 검증 환경 확보 후 연동 검증부터 재개한다.
+- 사용자 후속 승인에 따라 환경·외부 의존성으로 남은 미검증은 PR 본문에 이유·위험·검증 방법·머지 전 필수 여부를 공개하고 가능한 PR 작업을 마무리한다. 운영 문서 PR https://github.com/marcel615/ai-dlc/pull/5 는 미병합이며 이번 대화의 직접 승인을 적용 근거로 삼는다. Main 재실행: Node 23/23, npm run build, npm run lint 통과. 기존 독립 리뷰와 수정 결과를 유지하고 commit·push·PR 생성 및 Jira 검토 중 전환을 진행한다. 실제 Backend·Chrome·React 경계 검증은 머지 전 필수로 보류한다.

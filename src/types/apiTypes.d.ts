@@ -19,12 +19,12 @@ export interface PostDetail {
     categoryName?: string
     title: string
     content: string
+    isAuthor: boolean
     createdAt?: string
     updatedAt?: string
 }
 
 export interface PostCreateRequest {
-    userId: number
     categoryId: number
     title: string
     content: string
@@ -49,7 +49,7 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-    userId: number
-    email: string
-    nickname: string
+    accessToken: string
+    tokenType: string
+    expiresIn: number
 }
