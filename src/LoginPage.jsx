@@ -1,13 +1,15 @@
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { login } from './api/authApi'
+import { errorMessage as getErrorMessage } from './auth/session.js'
 import './LoginPage.css'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function LoginPage() {
     const navigate = useNavigate()
+    const location = useLocation()
     const {
         register,
         handleSubmit,
@@ -21,13 +23,14 @@ function LoginPage() {
 
     const loginMutation = useMutation({
         mutationFn: login,
-        onSuccess: response => {
-            alert(response.message || '로그인에 성공했습니다.')
+        onSuccess: () => {
+            alert('로그인에 성공했습니다.')
             navigate('/posts')
         }
     })
 
     const onSubmit = values => {
+        if (loginMutation.isPending) return
         loginMutation.mutate({
             email: values.email.trim(),
             password: values.password
@@ -37,11 +40,11 @@ function LoginPage() {
     const errorMessage =
         errors.email?.message ||
         errors.password?.message ||
-        loginMutation.error?.response?.data?.message ||
-        (loginMutation.error ? '로그인에 실패했습니다.' : '')
+        (loginMutation.error ? getErrorMessage(loginMutation.error, '로그인에 실패했습니다.') : '')
 
     return (
         <div className="login-page">
+            {location.state?.message && <p role="status">{location.state.message}</p>}
             <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
                 <label className="login-form-label" htmlFor="login-email">이메일</label>
                 <input

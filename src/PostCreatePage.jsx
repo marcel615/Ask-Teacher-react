@@ -1,22 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { createPost } from './api/postApi'
 import { getCategories } from './api/postCategoryApi'
 import { categoryKeys, postKeys } from './api/queryKeys'
 import PostForm from './component/PostForm'
+import { authSession } from './auth/authSession.js'
+import { useAuth } from './auth/useAuth.js'
+import { usePostDraft } from './auth/usePostDraft.js'
+import { errorMessage } from './auth/session.js'
 import './PostCreatePage.css'
 
 function PostCreatePage() {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const auth = useAuth()
     const {
         register,
         handleSubmit,
         control,
         formState: { errors }
     } = useForm({
-        defaultValues: {
+        defaultValues: authSession.readDraft('create', auth.userId) || {
             categoryId: '',
             title: '',
             content: ''
@@ -33,19 +38,21 @@ function PostCreatePage() {
     })
 
     const createMutation = useMutation({
-        mutationFn: createPost,
-        onSuccess: async response => {
+        mutationFn: async values => ({ response: await createPost(values), generation: auth.generation }),
+        onSuccess: async ({ generation }) => {
+            if (!authSession.isCurrent(generation)) return
+            authSession.clearDraft('create')
             await queryClient.invalidateQueries({ queryKey: postKeys.all })
-            alert(response.message || '게시글이 성공적으로 작성되었습니다.')
+            if (!authSession.isCurrent(generation)) return
+            alert('게시글이 성공적으로 작성되었습니다.')
             navigate('/posts')
         }
     })
-    const title = useWatch({ control, name: 'title' }) || ''
-    const content = useWatch({ control, name: 'content' }) || ''
+    const { title = '', content = '' } = usePostDraft('create', auth.userId, control)
 
     const onSubmit = values => {
+        if (createMutation.isPending) return
         createMutation.mutate({
-            userId: 1,
             categoryId: Number(values.categoryId),
             title: values.title.trim(),
             content: values.content.trim()
@@ -62,8 +69,7 @@ function PostCreatePage() {
     }
 
     const mutationError =
-        createMutation.error?.response?.data?.message ||
-        (createMutation.error ? '게시글 작성에 실패했습니다.' : '')
+        (createMutation.error ? errorMessage(createMutation.error, '게시글 작성에 실패했습니다.') : '')
 
     return (
         <div className="post-create-page">

@@ -1,6 +1,7 @@
 export const postKeys = {
     all: ['posts'],
-    detail: postId => ['posts', String(postId)]
+    details: ['posts', 'detail'],
+    detail: (postId, generation) => ['posts', 'detail', String(postId), generation]
 }
 
 export const categoryKeys = {

@@ -1,4 +1,5 @@
-import api from './api'
+import api from './api.js'
+import { authSession } from '../auth/authSession.js'
 
 /**
  * @typedef {import('../types/apiTypes').SignupRequest} SignupRequest
@@ -17,6 +18,5 @@ export const signup = async (signupData) => {
  * @param {LoginRequest} loginData
  */
 export const login = async (loginData) => {
-    const response = await api.post('/auth/login', loginData)
-    return response.data
+    return authSession.login(loginData)
 }

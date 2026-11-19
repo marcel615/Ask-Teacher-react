@@ -1,105 +1,62 @@
-import { useEffect } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useForm, useWatch } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getPost, updatePost } from './api/postApi'
 import { getCategories } from './api/postCategoryApi'
 import { categoryKeys, postKeys } from './api/queryKeys'
 import PostForm from './component/PostForm'
+import { authSession } from './auth/authSession.js'
+import { useAuth } from './auth/useAuth.js'
+import { usePostDraft } from './auth/usePostDraft.js'
+import { errorMessage } from './auth/session.js'
 import './PostEditpage.css'
 
-function PostEditPage() {
-    const { postId } = useParams()
+function EditForm({ postId, post, categories, auth }) {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const draftKey = `edit:${postId}`
+    const selectedCategory = categories.find(category => category.name === post.categoryName)
     const {
         register,
         handleSubmit,
-        reset,
         control,
         formState: { errors }
     } = useForm({
-        defaultValues: {
-            categoryId: '',
-            title: '',
-            content: ''
+        defaultValues: authSession.readDraft(draftKey, auth.userId) || {
+            categoryId: String(post.categoryId ?? selectedCategory?.id ?? ''),
+            title: post.title ?? '',
+            content: post.content ?? ''
         }
     })
-
-    const postQuery = useQuery({
-        queryKey: postKeys.detail(postId),
-        queryFn: () => getPost(postId),
-        enabled: Boolean(postId)
-    })
-
-    const categoryQuery = useQuery({
-        queryKey: categoryKeys.all,
-        queryFn: getCategories
-    })
-
-    useEffect(() => {
-        if (!postQuery.data || !categoryQuery.data) {
-            return
-        }
-
-        const selectedCategory = categoryQuery.data.find(category => (
-            category.id === postQuery.data.categoryId ||
-            category.name === postQuery.data.categoryName ||
-            category.id === postQuery.data.category?.id ||
-            category.name === postQuery.data.category?.name
-        ))
-
-        reset({
-            categoryId: String(postQuery.data.categoryId ?? selectedCategory?.id ?? ''),
-            title: postQuery.data.title ?? '',
-            content: postQuery.data.content ?? ''
-        })
-    }, [categoryQuery.data, postQuery.data, reset])
-
+    const { title = '', content = '' } = usePostDraft(draftKey, auth.userId, control)
     const updateMutation = useMutation({
-        mutationFn: postData => updatePost(postId, postData),
-        onSuccess: async () => {
-            await Promise.all([
-                queryClient.invalidateQueries({ queryKey: postKeys.all }),
-                queryClient.invalidateQueries({ queryKey: postKeys.detail(postId) })
-            ])
-            navigate(`/posts/${postId}`)
+        mutationFn: async values => ({
+            response: await updatePost(postId, values),
+            generation: auth.generation
+        }),
+        onSuccess: async ({ generation }) => {
+            if (!authSession.isCurrent(generation)) return
+            authSession.clearDraft(draftKey)
+            await queryClient.invalidateQueries({ queryKey: postKeys.all })
+            if (authSession.isCurrent(generation)) navigate(`/posts/${postId}`)
         }
     })
-    const title = useWatch({ control, name: 'title' }) || ''
-    const content = useWatch({ control, name: 'content' }) || ''
-
     const onSubmit = values => {
+        if (updateMutation.isPending) return
         updateMutation.mutate({
-            userId: 1,
             categoryId: Number(values.categoryId),
             title: values.title.trim(),
             content: values.content.trim()
         })
     }
-
-    if (postQuery.isLoading || categoryQuery.isLoading) {
-        return <div className="post-edit-page">로딩 중...</div>
-    }
-
-    const queryError = postQuery.error || categoryQuery.error
-    if (queryError) {
-        const message = queryError.response?.data?.message || '게시글 수정 정보를 불러오지 못했습니다.'
-        return <div className="post-edit-page">{message}</div>
-    }
-
-    const mutationError =
-        updateMutation.error?.response?.data?.message ||
-        (updateMutation.error ? '게시글 수정에 실패했습니다.' : '')
-
     return (
         <div className="post-edit-page">
             <h3 className="post-edit-page-title">Post Edit Form</h3>
-            {mutationError && (
-                <p className="post-edit-page-error">{mutationError}</p>
+            {updateMutation.error && (
+                <p role="alert">{errorMessage(updateMutation.error, '게시글 수정에 실패했습니다.')}</p>
             )}
             <PostForm
-                categoryList={categoryQuery.data}
+                categoryList={categories}
                 register={register}
                 errors={errors}
                 titleLength={title.length}
@@ -109,6 +66,46 @@ function PostEditPage() {
                 disabled={updateMutation.isPending}
             />
         </div>
+    )
+}
+
+function PostEditPage() {
+    const { postId } = useParams()
+    const auth = useAuth()
+    const postQuery = useQuery({
+        queryKey: postKeys.detail(postId, auth.generation),
+        queryFn: ({ signal }) => getPost(postId, signal),
+        enabled: Boolean(postId),
+        retry: false
+    })
+    const categoryQuery = useQuery({
+        queryKey: categoryKeys.all,
+        queryFn: getCategories
+    })
+    if (postQuery.isPending || categoryQuery.isPending) return <p role="status">로딩 중...</p>
+    const queryError = postQuery.error || categoryQuery.error
+    if (queryError) {
+        const retryQueries = () => {
+            void postQuery.refetch()
+            void categoryQuery.refetch()
+        }
+        return (
+            <div role="alert">
+                <p>{errorMessage(queryError, '게시글 수정 정보를 불러오지 못했습니다.')}</p>
+                <button onClick={retryQueries}>다시 시도</button>
+            </div>
+        )
+    }
+    if (postQuery.isFetching) return <p role="status">작성자 권한을 확인하고 있습니다...</p>
+    if (postQuery.data?.isAuthor !== true) return <p role="alert">작성자만 게시글을 수정할 수 있습니다.</p>
+    return (
+        <EditForm
+            key={`${postId}:${auth.generation}`}
+            postId={postId}
+            post={postQuery.data}
+            categories={categoryQuery.data}
+            auth={auth}
+        />
     )
 }
 
