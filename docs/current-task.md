@@ -51,3 +51,14 @@ Main은 [Specs PR #12](https://github.com/marcel615/Ask-Teacher-specs/pull/12)�
 - Chrome에서 로그인 폼 검증·중복 제출·메뉴, 공개/보호 화면의 로딩·실패·빈 상태, 작성자 true/false/누락/오류, 직접 수정 URL, 로그인 왕복 입력 복원, 다중 탭 및 계정 전환을 확인한다.
 - ASK-16 제공 후 실제 Frontend·Backend commit과 공식 계약 SHA, 검증 일시·실행 주소를 기록하고 화면·Network의 URL/Payload/Response·Console을 확인한다. 실제 작성자·비작성자·비로그인, 인증 실패·장애와 `Cache-Control: no-store`, 수정·삭제 직접 요청의 서버 인가를 검증한다.
 - 실행 결과와 미실행·실패·보류를 구분하고 독립 리뷰 및 append-only devlog를 반영한다. 최종 push head의 CI·필수 리뷰·보호 조건·충돌을 Main이 확인하며 준비되지 않은 게이트를 완료로 보고하지 않는다.
+
+## 2026-11-19 Backend 연계 검증 재개
+
+- 사용자는 ASK-16 완료에 따라 [Frontend PR #30](https://github.com/marcel615/Ask-Teacher-react/pull/30)에 남은 Backend 연계 체크만 진행하도록 요청했다. Main이 설계 게이트를 승인했다. 앞선 미검증 기록은 당시 상태로 보존하고 이번 검증의 실제 결과로 해당 항목만 갱신한다.
+- Frontend 시작 head는 `ca2a02b2c994d119d5ebd2a8122c7fca69bb85e0`, 브랜치는 `feature/issue-14-frontend-auth`다. Backend `develop`은 `c7bcc0921569737c319181af7081b76cce0cbc99`이며 Main이 ASK-16 완료와 [Backend PR #84](https://github.com/marcel615/Ask-Teacher-spring/pull/84)의 develop 병합을 확인했다. 공식 Specs main 기준은 기존 `bb06abd9d2557a37ca19ae1bde3bc1b23f878357`로 유지한다.
+- 실제 Backend 주소는 `http://127.0.0.1:18080/api`다. test 프로필과 `spring.config.additional-location=file:C:/Users/alswo/Desktop/Projects/Ask-Teacher/Ask-Teacher-spring/src/test/resources/application-test.yaml`을 명시해 UUID H2 메모리 DB, create-drop, 임시 업로드 경로를 사용한다. 카테고리는 기존 CategoryDataInitializer의 기본 시드를 사용하며 외부 SQL은 필요하지 않다.
+- Redis는 Main이 준비한 전용 컨테이너 `askteacher-ask14-link-redis`의 `127.0.0.1:16379`만 사용한다. Redis 연결·명령 timeout은 이번 실행에서 500ms로 지정한다. 기존 `.env`, DB와 Redis 6379 또는 다른 서비스의 저장소는 사용하지 않는다.
+- 실제 FE 세션·Axios·게시글 API 모듈과 실제 Backend HTTP를 사용하는 검증 하네스를 추가한다. Node Cookie jar와 브라우저 조정 환경을 제공하되 Backend 응답은 모의 처리하지 않는다. 작성자·다른 계정·비로그인의 필수 isAuthor true/false, no-store, 공식 flat 응답·multipart 변경, Bearer 오류 401, 작성자 권한 403, 없는 게시글 404 및 전용 Redis 장애 시 503을 확인한다. 직접 PATCH·DELETE 서버 인가와 변경 금지도 검증한다.
+- CSRF 획득·쿠키·헤더·회전 후 재획득·오류 403·수동 재시도, 재발급 및 로그아웃 204, 허용 Origin의 credential/preflight 응답과 비허용 Origin 거절을 확인한다. 전용 Redis만 일시 중단·복구해 실제 장애와 FE 수동 복구를 검증한다.
+- 이번 변경 권한은 검증 하네스·테스트, FE 작업 기록과 PR 본문 갱신에 한정한다. 제품 코드·공식 계약·운영 파일·Backend 소스는 변경하지 않는다. 실행 결과와 실제 환경·commit을 남기며 새로 실행하지 않은 검증은 성공으로 처리하지 않는다.
+- Chrome 화면·실제 브라우저의 쿠키/CORS 실행·다중 탭·React 경계의 쿼리 취소 검증은 이번 범위 밖 미검증으로 유지한다. Node Cookie jar 및 HTTP CORS 헤더 검증이 이를 대신하지 않는다. PR 준비와 머지 준비를 계속 구분하고 남은 검증·위험·재개 조건을 PR 본문에 공개한다.
