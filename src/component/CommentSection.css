@@ -1,0 +1,75 @@
+.comment-section {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+}
+
+.comment-toolbar,
+.comment-actions,
+.comment-meta,
+.comment-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+.comment-toolbar {
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.comment-toolbar h4 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.comment-toolbar select {
+    margin-left: 8px;
+}
+
+.comment-form {
+    display: grid;
+    gap: 8px;
+}
+
+.comment-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px;
+    font: inherit;
+    resize: vertical;
+}
+
+.comment-list {
+    margin: 16px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.comment-list li {
+    padding: 14px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.comment-meta {
+    color: #555;
+    font-size: 14px;
+}
+
+.comment-content {
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.comment-pagination {
+    justify-content: center;
+}
+
+.comment-error {
+    color: #a32222;
+}
+
+.comment-section button[aria-pressed="true"] {
+    color: #a32222;
+}

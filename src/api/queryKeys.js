@@ -7,3 +7,9 @@ export const postKeys = {
 export const categoryKeys = {
     all: ['categories']
 }
+
+export const commentKeys = {
+    all: ['comments'],
+    session: (postId, generation) => [...commentKeys.all, String(postId), generation],
+    list: (postId, generation, sort, page) => [...commentKeys.session(postId, generation), sort, page]
+}

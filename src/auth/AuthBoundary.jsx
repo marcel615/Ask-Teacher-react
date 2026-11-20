@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Navigate, useLocation } from 'react-router-dom'
 import { authSession } from './authSession.js'
 import { useAuth } from './useAuth.js'
-import { postKeys } from '../api/queryKeys.js'
+import { commentKeys, postKeys } from '../api/queryKeys.js'
 
 export function AuthLifecycle({ children }) {
     const queryClient = useQueryClient()
@@ -13,8 +13,10 @@ export function AuthLifecycle({ children }) {
             const generation = authSession.getSnapshot().generation
             if (generation !== previous) {
                 previous = generation
-                void queryClient.cancelQueries({ queryKey: postKeys.details })
-                queryClient.removeQueries({ queryKey: postKeys.details })
+                for (const queryKey of [postKeys.details, commentKeys.all]) {
+                    void queryClient.cancelQueries({ queryKey })
+                    queryClient.removeQueries({ queryKey })
+                }
             }
         })
         void authSession.restore().catch(() => {})

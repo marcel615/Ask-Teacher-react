@@ -6,6 +6,7 @@ import { authSession } from './auth/authSession.js'
 import { useAuth } from './auth/useAuth.js'
 import { SessionStatus } from './auth/AuthBoundary.jsx'
 import { errorMessage } from './auth/session.js'
+import CommentSection from './component/CommentSection.jsx'
 import PostLikeButton from './component/PostLikeButton.jsx'
 import './PostDetailPage.css'
 
@@ -88,6 +89,11 @@ function PostDetailPage() {
                     </button>
                 </div>
             )}
+            <CommentSection
+                key={JSON.stringify(postKeys.detail(postId, auth.generation))}
+                postId={postId}
+                auth={auth}
+            />
         </div>
     )
 }
