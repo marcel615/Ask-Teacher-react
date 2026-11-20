@@ -8,3 +8,5 @@
 - React lint/build, git diff --check, 인증 자동 검증 23건이 통과했다. 기존 ASK-14 전용 옵트인 HTTP 테스트 1건의 전용 환경은 이번에 실행하지 않았다.
 - 격리된 Spring과 H2 메모리 DB, 전용 Redis, Vite preview, Chrome에서 임시 계정 2개로 검증했다. 댓글 요청 42건의 URL, 쿼리, Payload 및 응답과 Console을 확인했다. 비로그인 키보드 안내, 댓글 영역만 실패하는 경우, 페이지·정렬·빈 목록, 댓글 CRUD, 입력 검사·유지와 중복 제출 방지, 계정 변경 중 지연 응답, 실제 401·403·404·409, 503 응답 주입, 전송 및 응답 유실, 실제 Chrome 오프라인과 복구를 검증했다.
 - Redis 중단으로 인한 실제 503과 댓글 요청 중 실제 토큰 만료는 별도로 유도하지 않았다. 댓글 503 UI는 주입 응답으로, 인증 재발급은 기존 자동 테스트로 확인했다.
+
+- [React PR #32](https://github.com/marcel615/Ask-Teacher-react/pull/32)를 develop 대상으로 열었다. Jira 웹 링크를 추가·재조회한 뒤 ASK-20을 검토 중으로 옮기고 상태를 다시 확인했다.
