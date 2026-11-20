@@ -9,6 +9,7 @@ export interface PostSummary {
     title: string
     writerNickname?: string
     newPost?: boolean
+    likeCount: number
     createdAt?: string
 }
 
@@ -20,6 +21,8 @@ export interface PostDetail {
     title: string
     content: string
     isAuthor: boolean
+    likeCount: number
+    likedByMe: boolean
     createdAt?: string
     updatedAt?: string
 }

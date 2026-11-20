@@ -6,6 +6,7 @@ import { authSession } from './auth/authSession.js'
 import { useAuth } from './auth/useAuth.js'
 import { SessionStatus } from './auth/AuthBoundary.jsx'
 import { errorMessage } from './auth/session.js'
+import PostLikeButton from './component/PostLikeButton.jsx'
 import './PostDetailPage.css'
 
 const formatDateTime = dateTime => dateTime ? dateTime.replace('T', ' ').slice(0, 16) : ''
@@ -58,6 +59,14 @@ function PostDetailPage() {
             </div>
             <h3 className="post-detail-title">{post.title}</h3>
             <p className="post-detail-content">{post.content}</p>
+            <PostLikeButton
+                key={JSON.stringify(postKeys.detail(postId, auth.generation))}
+                postId={postId}
+                auth={auth}
+                likeCount={post.likeCount}
+                likedByMe={post.likedByMe === true}
+                isFetching={postQuery.isFetching || deleteMutation.isPending}
+            />
             {deleteMutation.error && (
                 <p role="alert">{errorMessage(deleteMutation.error, '게시글 삭제에 실패했습니다.')}</p>
             )}

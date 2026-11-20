@@ -44,3 +44,11 @@ export const deletePost = async (postId) => {
     return response.data
 }
 
+export const likePost = async postId => {
+    await authSession.request({ method: 'post', url: `/posts/${postId}/likes` })
+}
+
+export const unlikePost = async postId => {
+    await authSession.request({ method: 'delete', url: `/posts/${postId}/likes` })
+}
+
