@@ -1,31 +1,11 @@
-# 현재 작업 기록: ASK-14
+# ASK-17 작업 기록
 
-- 작업: [ASK-14 — 프론트엔드 인증 연동 및 로그인 상태 관리](https://marcel615.atlassian.net/browse/ASK-14). 사용자의 2026-11-18 18:14 KST ‘착수 가능’ 전환을 Main이 확인하고, ‘진행 중’ 전환과 재조회를 완료했다. 이전 기록은 [기준 커밋](https://github.com/marcel615/Ask-Teacher-react/blob/e506e3d5bb7a9569564e9cb82dbc583f0b2c114e/docs/current-work-log.md)에 보존된다.
-- 기준: Frontend `develop` `e506e3d5bb7a9569564e9cb82dbc583f0b2c114e`, 작업 브랜치 `feature/issue-14-frontend-auth`. 등록 경로·Git root·fetch/push origin 일치 및 clean 상태, 열린 PR 없음을 Main이 확인했다.
-- 공식 기준: Specs `main` `bb06abd9d2557a37ca19ae1bde3bc1b23f878357`의 요구사항·API·인증·ERD·UI. Specs PR #12 실제 병합 및 작성자 표시 계약 반영을 확인했다. 공식 계약·운영 파일·Backend는 수정하지 않는다.
-- Architect 설계와 Main 설계 게이트 통과. 메모리 인증/입력, CSRF와 세션 복구, 탭 간 쿠키 변경 직렬화, 인증 상태별 상세 캐시와 작성자 표시, multipart/flat 응답 정리를 수행한다. JWT subject는 입력 계정 분리용이며 인가 판단에 사용하지 않는다.
-- 작업 전 `npm run build`, `npm run lint` 통과. 구현 초안에서도 두 명령이 통과했다. 빌드/린트는 기능·전체 타입 검사를 대신하지 않는다.
-- 실제 Backend ASK-16은 미완료이며, Main 읽기 전용 확인에서 Backend `develop` `457d8fecad180b8610523fb8a2e5d99baec7eed8`에 `isAuthor` 제공 코드와 localhost:8080 서버가 없다. 타 프로젝트 Redis는 사용하지 않는다. 실제 연동과 최종 구현/머지 준비 게이트는 보류한다.
-- Main의 브라우저 검증은 IAB localhost 타임아웃 및 native Chrome URL 확인 제한으로 중단됐다. 실제 화면·Network·Console은 미검증이며 모의 API/자동 테스트를 실제 서버 연동 성공으로 보고하지 않는다.
-- 인증 구현: 세션 모듈에서 Web Locks로 CSRF 획득부터 로그인·재발급·로그아웃 후 재획득까지 직렬화한다. 진행 중 복구 Promise를 공유하고 BroadcastChannel로 현재 토큰을 일시 전달하되 localStorage에는 비밀 없는 버전·상태만 남긴다. 통신 실패·재발급 응답 유실은 자동 회전을 중단한다. 다른 탭의 선행 재발급이 명시적 로그아웃을 취소하지 못하게 하며 인증 세대가 바뀐 요청·화면 콜백을 차단한다.
-- 화면/API: 보호 라우트·헤더·로그인·로그아웃·세션 오류/수동 재시도, 현재 `isAuthor`에 따른 수정/삭제와 직접 수정 URL, 인증 세대별 상세 key/취소·제거, 메모리 입력의 동일 계정 복원·폐기, multipart와 flat DTO/page content/category 배열을 반영했다. 새 첨부·검색/페이징 UI·소셜 로그인은 추가하지 않았다.
-- 자동 검증: `node --test tests/auth-session.test.mjs` 13/13 통과. CSRF credential·순서, Bearer/multipart, single-flight, 두 탭 직렬화·로그아웃·재발급 유실 중단, 403 수동 재시도, 503와 로그아웃 실패, 복구 중 로그아웃·이전 계정 응답 차단, 입력 계정 분리·폐기, 공개 상세 fallback, 조정 미지원 및 공식 응답 파싱을 격리된 모의 전송/브라우저로 검증했다. 실제 Chrome/서버 검증은 아니다.
-- Architect 독립 리뷰 수정 1회: 늦게 도착한 만료 토큰의 401은 이미 갱신된 같은 계정/세대의 토큰을 사용해 원요청을 한 번만 재시도한다. 로그아웃 204 및 로그인·복구 200의 확정 성공을 후속 CSRF 재획득 실패와 분리하고, 로그아웃은 먼저 로컬/다른 탭에 비로그인·입력 폐기를 확정한다. CSRF 후처리 실패는 별도 안내하며 다음 명시적 인증 요청에서 재획득한다. 동일 계정 원격 로그인도 상세 세대를 갱신한다.
-- 수정 검증: 토큰별 만료 및 지연 401, 로그아웃 204 뒤 CSRF 503/네트워크 실패의 두 탭 상태·입력 정리, 로그인/재발급 200 뒤 후처리 실패, BroadcastChannel 우선 후 storage 통지의 동일 계정 로그인, 오류 메시지 fallback을 추가해 Node 자동 검증 20/20 통과. README 제한 사항과 상세/수정 화면 가독성도 정리했다.
-- 자동 검증 한계: 탭 통신·storage 순서는 모의 환경에서 지정한 경우만 확인했다. 실제 브라우저 이벤트 순서 전체와 React 화면의 Query 취소·재조회·입력 복원은 검증하지 않았으며, 실제 Backend 연동 및 화면/Network/Console 게이트는 계속 보류한다.
-- Architect/Main 검토 수정 2회(마지막): 명시적 로그아웃이 재발급 잠금을 기다리는 동안 과거 재발급의 401·503·응답 유실이 현재 revision을 다시 바꾸어 로그아웃을 취소하지 않도록 오류 처리에도 세대 검사를 적용했다. 회전 결과가 불명확하면 공유 중단 상태는 전파하되 현재 명시적 동작의 revision을 변경하지 않는다.
-- 회귀 검증: 지연된 재발급 401·503·네트워크 실패 각각에서 대기한 로그아웃이 서버에 한 번 전송되고 두 탭의 토큰이 제거되는지 추가 확인했다. `node --test tests/auth-session.test.mjs` 23/23, `npm run lint`, `npm run build`, `git diff --check` 통과. 실제 Backend·Chrome 화면/Network/Console 검증은 계속 보류한다.
-- Main 최종 확인: 수정 2회 뒤 Architect 관련 재리뷰의 필수 지적 해소, Node 23/23 및 diff 검사 통과. Reporter의 승인된 devlog를 2026-11.md에 append-only로 반영했다. Jira ASK-14 진행 중 / ASK-16 착수 가능 및 Backend 기준 SHA·isAuthor 미제공·서버 미실행을 다시 확인했다. 실제 연동·화면 검증이 남아 구현 게이트 보류, commit·push·PR 없음. 작업 브랜치의 변경을 보존하며 ASK-16 제공과 브라우저 검증 환경 확보 후 연동 검증부터 재개한다.
-- 사용자 후속 승인에 따라 환경·외부 의존성으로 남은 미검증은 PR 본문에 이유·위험·검증 방법·머지 전 필수 여부를 공개하고 가능한 PR 작업을 마무리한다. 운영 문서 PR https://github.com/marcel615/ai-dlc/pull/5 는 미병합이며 이번 대화의 직접 승인을 적용 근거로 삼는다. Main 재실행: Node 23/23, npm run build, npm run lint 통과. 기존 독립 리뷰와 수정 결과를 유지하고 commit·push·PR 생성 및 Jira 검토 중 전환을 진행한다. 실제 Backend·Chrome·React 경계 검증은 머지 전 필수로 보류한다.
-- PR https://github.com/marcel615/Ask-Teacher-react/pull/30 생성(develop 대상, 코드 commit 1f6de236aabc15c240357edcbac477f31e9489e8) 및 ASK-14 원격 링크 재조회 확인 후 검토 중 전환·재조회 완료. 독립 리뷰·수정 결과를 PR 일반 리뷰로 기록했고 Reporter가 후속 상태를 devlog에 append-only로 반영했다. CI workflow/현재 체크 0개로 CI 성공은 주장하지 않는다. PR 충돌 없음, develop ruleset의 PR 필수·강제 push/삭제 금지·필수 승인 수 0을 확인했다. 미검증은 PR 본문의 머지 전 필수 표를 따르며 PR 준비 완료 / 머지 준비 보류다. 문서 기록을 push한 최종 head에서 외부 조건을 재확인한다.
+- GitHub에서 React·Specs·Spring의 기준 브랜치와 로컬 SHA 일치를 확인했다. 이전 ASK-14는 Jira 완료 상태이고 PR #30이 병합됐으며 월별 devlog에 해당 기록이 있다.
+- Jira의 가능한 전환을 확인해 ASK-17을 진행 중으로 전환했다. Jira 재조회로 전환을 확인했으며, React의 최신 develop에서 작업 브랜치를 만들었다.
+- 기존 인증 흐름과 세대별 상세 쿼리를 재사용하는 설계를 적용했다. 서버 좋아요 수·상태를 사용하며 별도 낙관적 갱신을 두지 않는다.
 
-## 2026-11-19 — 지정된 실제 Backend 연계 검증
-
-- 사용자 요청 ‘백엔드 연계 있던 체크 그것만’에 따라 실제 HTTP 연계 검증만 수행했다. Frontend 검증 기준 head `ca2a02b2c994d119d5ebd2a8122c7fca69bb85e0`, Backend `develop` `c7bcc0921569737c319181af7081b76cce0cbc99`, 공식 Specs `main` `bb06abd9d2557a37ca19ae1bde3bc1b23f878357`를 사용했다. 제품 소스·Backend·공식 계약·운영 설정은 변경하지 않았으며, `tests/backend-link.test.mjs`와 이번 기록만 Builder 범위에서 추가했다.
-- 실행 대상은 Main이 관리한 `http://127.0.0.1:18080/api`의 실제 Backend다. `test` 프로필과 `src/test/resources/application-test.yaml` 추가 설정을 사용한 UUID H2 메모리 DB(create-drop), 임시 업로드 경로, 의도적인 테스트 전용 JWT/CSRF 키, 전용 Redis `askteacher-ask14-link-redis`(redis:7, `127.0.0.1:16379`), Redis timeout/connect timeout 500ms로 격리했다. 기존 개발 데이터·다른 프로젝트 Redis·실제 .env를 사용하지 않았다. 신규 임시 계정 2개와 API 기본 카테고리를 사용했고 SQL 시드나 Backend 파일 수정은 하지 않았다.
-- 하네스는 실제 Frontend의 signup/category/post API, Axios 및 `authSession`/`createSession`을 실제 HTTP로 연결한다. API base URL은 하네스 실행 중에만 변경한다. Node에는 Cookie/Set-Cookie 경로와 Origin, 메모리 저장소·잠금·채널 환경만 제공하며 서버 응답을 모의하거나 변경하지 않는다. 만료 JWT 요청은 공개된 테스트 프로필 키로 만든 요청 fixture 한 번을 사용했다. URL 미설정 시 요청 없이 SKIP되며, 실행 URL과 장애 대상 컨테이너를 전용 값으로 제한한다.
-- 최초 실제 실행은 7개 시나리오가 통과했으나 ‘503 이후 동일 쿠키 수동 재발급은 반드시 authenticated로 복구된다’는 하네스 가정이 실패했고, 이후 삭제도 인증 부재로 실패했다. 이 결과를 제품 결함으로 단정하거나 성공으로 기록하지 않았다. 공식 정책은 503의 수동 재시도를 요구하지만 회전 미실행·기존 쿠키 복구 성공을 보장하지 않으므로 Main/Architect 확인 후 하네스만 1회 수정했다.
-- 수정 후 Main의 실제 재실행에서 `node --test tests/backend-link.test.mjs`가 시나리오 9개 모두 통과했다(Node 집계는 상위 테스트를 포함해 10/10). 실제 회원가입·카테고리·multipart 생성/수정/삭제, 필수 불리언 `isAuthor` 작성자 true/비작성자 false/비로그인 false 및 `Cache-Control: no-store`, 비작성자 PATCH/DELETE 403·데이터 불변·불필요한 재발급 없음, 만료 JWT의 실제 401→재발급→재조회, 폐기된 세션의 재발급 거부→비인증 상세 재조회, 404·CSRF 403, 허용/비허용 Origin의 credential CORS preflight 응답, 로그아웃 204·쿠키/로컬 인증 정리를 확인했다.
-- 실제 Redis 장애는 전용 컨테이너에만 pause/unpause를 적용하고 `finally`에서 unpause했다. Main은 최종 unpause도 확인했다. Bearer 상세/재발급은 실제 503으로 거부되고 FE는 error 상태를 유지했으며, Refresh 쿠키는 보존되고 비인증 상세는 200/작성자 false였다. 해당 임시 사용자 세션의 회전 count만 읽은 결과 pause 전 0→unpause 후 1로 증가했다. 즉, 응답은 503이었지만 timeout된 회전이 서버에서 뒤늦게 실행됐다는 근거가 확인됐다. 이후 명시적 재발급은 실제 HTTP 401이었고 FE는 비로그인·토큰 제거·자동 반복 중단을 적용했다. 명시적 재로그인으로 인증과 작성자 true를 복구한 뒤 실제 삭제·로그아웃을 완료했다. 이 재로그인 경로를 동일 쿠키 재발급 성공으로 보고하지 않는다.
-- 한계: 이번 결과는 Node HTTP 연계 검증이다. 실제 Chrome의 SameSite/Secure·쿠키 차단 정책, 브라우저 CORS 강제 동작, 화면/Network/Console, 실제 다중 탭 이벤트 순서 및 React Query 취소·재조회·입력 복원은 검증하지 않았다. 서버 CORS 응답 헤더 확인을 브라우저 통합 성공으로 대신하지 않으며, 이 항목들은 기존 미검증 상태를 유지한다.
-- 마무리: Architect 읽기 전용 독립 리뷰의 필수 지적이 없고 문법·diff 검사가 통과했다. Main이 테스트용 Backend와 전용 Redis를 종료했으며 `18080`/`16379` listener 없음과 Backend Git clean 상태를 확인했다. Builder는 commit·push·PR 변경을 수행하지 않았다.
+- 독립 리뷰에서 변경보다 먼저 시작한 최초 조회가 이전 좋아요 수를 남기는 경우를 찾았다. 완료 시 정확한 목록 및 현재 인증 세대 상세의 조회를 취소한 뒤 다시 요청하도록 수정했다. Architect가 지연된 목록·상세 응답의 캐시 덮어쓰기 방지와 필수 지적 해소를 재확인했다.
+- React lint/build 및 기존 인증 자동 검증 23건을 통과했다. 기존 ASK-14 옵트인 HTTP 테스트는 이번 작업에서 실행하지 않았다.
+- Chrome headless와 격리된 Spring `2c4d02d76cfe5690755c4b0a8deddd0e28df7eac`에서 임시 계정 2개와 새 게시글을 사용했다. Spring은 테스트 프로필과 H2 메모리 DB, 테스트 전용 Redis `127.0.0.1:16379`로 실행했다.
+- 화면·Network 검증에서 비로그인 키보드 클릭과 유지된 게시글·로그인 링크·변경 요청 0건, 실제 POST 200과 DELETE 204, 연속 클릭 1건, 목록 수·새로고침, 실제 중복 400, 404, 요청 중 계정 전환을 확인했다. Chrome에서 전송 실패와 서버 적용 후 응답 유실을 제어해 재시도 및 중복 반전 방지도 확인했다. 허용된 전송 실패·HTTP 오류 이외의 콘솔 및 페이지 오류는 없었다.
+- 이번 좋아요 브라우저 검증은 실제 토큰 만료를 유도하지 않았다. 인증 재발급 및 계정 변경 회귀 시나리오는 기존 Node 자동 검증에서 확인했다.

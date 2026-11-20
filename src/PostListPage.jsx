@@ -56,6 +56,7 @@ const PostListPage = () => {
                             {post.title}
                             {post.newPost && <span className="post-new-badge">new</span>}
                         </Link>
+                        <p className="post-item-like-count">좋아요 {post.likeCount}</p>
                     </div>
                 ))}
             </div>

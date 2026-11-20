@@ -81,3 +81,9 @@
     color: #555;
     line-height: 1.5;
 }
+
+.post-item-like-count {
+    margin: 8px 0 0;
+    color: #555;
+    font-size: 14px;
+}
