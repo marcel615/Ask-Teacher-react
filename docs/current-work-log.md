@@ -7,3 +7,5 @@
 - 자체 리뷰와 Architect 독립 리뷰를 수행했다. 범위를 벗어난 URL을 보정할 때 미제출 검색어·카테고리와 포커스가 사라지는 문제를 수정했다. Architect가 메모리 라우터로 보정 및 이력 이동을 재검증했고 추가 필수 지적은 없었다.
 - npm run lint, npm run build, git diff --check와 기존 자동 테스트 23건이 통과했다. ASK-14 전용 옵트인 연동 테스트 1건은 미실행이다.
 - 격리 Spring H2·전용 Redis·Vite preview·Chrome에서 로그인/비로그인 조건 조합, 버튼/Enter, 목록 이력 및 새로고침, 0건/1페이지와 마지막 페이지, 지연된 URL 보정 중 입력·포커스 보존, 404와 개별 오류/재시도, 게시글 상세·작성 이동, 필터 목록에서 실제 좋아요 갱신을 확인했다. Chrome에서 게시글 계열 응답 31건의 URL·상태와 대표 응답의 페이지·건수를 확인했고 JavaScript 예외·console.error는 없었다. 404는 Spring 응답이며 목록과 카테고리 503은 응답 주입이다.
+
+- 제품 변경은 7c181e9로 commit·push했다. [React PR #33](https://github.com/marcel615/Ask-Teacher-react/pull/33)을 develop 대상으로 열고 Jira 웹 링크 10046을 추가·재조회했다. ASK-19를 검토 중으로 전환하고 재조회했다.
