@@ -4,6 +4,13 @@ export interface ApiResponse<T = unknown> {
     data?: T
 }
 
+export interface PostListParams {
+    keyword?: string
+    categoryId?: string
+    page?: number
+    size?: number
+}
+
 export interface PostSummary {
     postId: number
     title: string
@@ -54,7 +61,46 @@ export interface PostCreateRequest {
     files?: File[]
 }
 
-export interface PostUpdateRequest extends PostCreateRequest {}
+export interface PostCreateResult {
+    postId: number
+    title: string
+    newPost: boolean
+    createdAt: string
+}
+
+export type PostUpdateRequest = PostCreateRequest
+
+export interface PostUpdateResult {
+    postId: number
+    categoryId: number
+    title: string
+    content: string
+    updatedAt: string
+}
+
+export type CommentSort = 'latest' | 'likeCount'
+
+export interface PostComment {
+    commentId: number
+    postId: number
+    writerId: number
+    writerNickname: string
+    content: string
+    likeCount: number
+    likedByMe: boolean
+    createdAt: string
+    updatedAt: string
+}
+
+export interface CommentPage {
+    comments: PostComment[]
+    page: number
+    size: number
+    totalElements: number
+    totalPages: number
+    hasNext: boolean
+    sort: CommentSort
+}
 
 export interface Category {
     id: number
@@ -65,6 +111,12 @@ export interface SignupRequest {
     email: string
     password: string
     nickname: string
+}
+
+export interface SignupResult {
+    userId: number
+    nickname: string
+    email: string
 }
 
 export interface LoginRequest {

@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { signup } from './api/authApi'
+import type { SignupRequest } from './types/apiTypes'
 import './SignupPage.css'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -12,7 +13,7 @@ function SignupPage() {
         register,
         handleSubmit,
         formState: { errors }
-    } = useForm({
+    } = useForm<SignupRequest>({
         defaultValues: {
             nickname: '',
             email: '',
@@ -30,7 +31,7 @@ function SignupPage() {
         }
     })
 
-    const onSubmit = values => {
+    const onSubmit = (values: SignupRequest) => {
         signupMutation.mutate({
             email: values.email.trim(),
             password: values.password,
@@ -38,11 +39,12 @@ function SignupPage() {
         })
     }
 
+    const requestError = signupMutation.error as (Error & { response?: { data?: { message?: string } } }) | null
     const errorMessage =
         errors.nickname?.message ||
         errors.email?.message ||
         errors.password?.message ||
-        signupMutation.error?.response?.data?.message ||
+        requestError?.response?.data?.message ||
         (signupMutation.error ? '회원가입에 실패했습니다.' : '')
 
     return (

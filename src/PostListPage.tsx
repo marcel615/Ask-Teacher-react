@@ -1,34 +1,45 @@
 import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import type { UseQueryResult } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { getPostPage } from './api/postApi'
 import { getCategories } from './api/postCategoryApi'
 import { categoryKeys, postKeys } from './api/queryKeys'
 import { errorMessage } from './auth/session'
+import type { Category } from './types/apiTypes'
 import './PostListPage.css'
 
 const FIRST_PAGE = 1
 // Spring Data's JPA query offset is an int. Resolve larger offsets from page metadata.
 const MAX_REQUEST_PAGE = Math.floor(2147483647 / 10) + 1
 
-const formatDateTime = dateTime => dateTime?.replace('T', ' ').slice(0, 16) || ''
+const formatDateTime = (dateTime?: string) => dateTime?.replace('T', ' ').slice(0, 16) || ''
 
-function readPage(value) {
+function readPage(value: string | null) {
     if (!/^\d+$/.test(value ?? '') || Number(value) < FIRST_PAGE) return FIRST_PAGE
     return Math.min(Number(value), MAX_REQUEST_PAGE + 1)
 }
 
-function updatePage(params, page) {
+function updatePage(params: URLSearchParams, page: number) {
     if (page === FIRST_PAGE) params.delete('page')
     else params.set('page', String(page))
 }
 
-function PostSearchForm({ keyword, categoryId, categories, onSearch }) {
+interface PostSearchFormProps {
+    keyword: string
+    categoryId: string
+    categories: UseQueryResult<Category[]>
+    onSearch: (keyword: string, categoryId: string) => void
+}
+
+function PostSearchForm({ keyword, categoryId, categories, onSearch }: PostSearchFormProps) {
     const [draftKeyword, setDraftKeyword] = useState(keyword)
     const [draftCategory, setDraftCategory] = useState(categoryId)
     const hasDraftCategory = categories.data?.some(category => String(category.id) === draftCategory)
 
-    const handleSubmit = event => {
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         onSearch(draftKeyword.trim(), draftCategory)
     }
@@ -70,7 +81,13 @@ function PostSearchForm({ keyword, categoryId, categories, onSearch }) {
     )
 }
 
-function PostPagination({ page, lastPage, onPageChange }) {
+interface PostPaginationProps {
+    page: number
+    lastPage: number
+    onPageChange: (page: number) => void
+}
+
+function PostPagination({ page, lastPage, onPageChange }: PostPaginationProps) {
     const firstVisible = Math.max(FIRST_PAGE, Math.min(page - 2, lastPage - 4))
     const lastVisible = Math.min(firstVisible + 4, lastPage)
     const pageNumbers = Array.from({ length: lastVisible - firstVisible + 1 }, (_, index) => firstVisible + index)
@@ -98,7 +115,8 @@ function PostPagination({ page, lastPage, onPageChange }) {
 
 const PostListPage = () => {
     const navigate = useNavigate()
-    const { key: locationKey, state: locationState } = useLocation()
+    const { key: locationKey, state } = useLocation()
+    const locationState = state as { postSearchFormKey?: string } | null
     const formKey = locationState?.postSearchFormKey ?? locationKey
     const [searchParams, setSearchParams] = useSearchParams()
     const keyword = searchParams.get('keyword')?.trim() || ''
@@ -141,7 +159,7 @@ const PostListPage = () => {
     }, [displayedPage, formKey, isCorrectingPage, locationState, page, posts.isFetching, posts.isSuccess, rawPage,
         searchParams, setSearchParams])
 
-    const handleSearch = (nextKeyword, nextCategoryId) => {
+    const handleSearch = (nextKeyword: string, nextCategoryId: string) => {
         const nextParams = new URLSearchParams(searchParams)
         if (nextKeyword) nextParams.set('keyword', nextKeyword)
         else nextParams.delete('keyword')
@@ -153,14 +171,14 @@ const PostListPage = () => {
         else setSearchParams(nextParams)
     }
 
-    const handlePageChange = nextPage => {
+    const handlePageChange = (nextPage: number) => {
         if (nextPage === page) return
         const nextParams = new URLSearchParams(searchParams)
         updatePage(nextParams, nextPage)
         setSearchParams(nextParams)
     }
 
-    const categoryNotFound = categoryId && posts.error?.response?.status === 404
+    const categoryNotFound = categoryId && isAxiosError(posts.error) && posts.error.response?.status === 404
 
     return (
         <div className="post-list-page">

@@ -1,4 +1,4 @@
-import api from '../api/api.js'
-import { createSession } from './session.js'
+import api from '../api/api.ts'
+import { createSession } from './session.ts'
 
 export const authSession = createSession({ transport: config => api.request(config) })

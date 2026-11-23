@@ -1,8 +1,30 @@
 import { useId, useRef, useState } from 'react'
-import PostAttachments from './PostAttachments.jsx'
+import type { ChangeEvent, FormEvent } from 'react'
+import type { FieldErrors, UseFormHandleSubmit, UseFormRegister } from 'react-hook-form'
+import PostAttachments from './PostAttachments'
+import type { Category, PostAttachment } from '../types/apiTypes'
+import type { PostFormValues } from '../types/postForm'
 import './PostForm.css'
 
 const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
+
+interface SelectedFile {
+    id: number
+    file: File
+}
+
+interface PostFormProps {
+    categoryList?: Category[]
+    register: UseFormRegister<PostFormValues>
+    errors?: FieldErrors<PostFormValues>
+    titleLength?: number
+    contentLength?: number
+    savedFiles?: PostAttachment[]
+    handleSubmit: UseFormHandleSubmit<PostFormValues>
+    onSubmit: (values: PostFormValues, files: File[]) => Promise<unknown>
+    submitText: string
+    disabled?: boolean
+}
 
 function PostForm({
     categoryList = [],
@@ -15,19 +37,19 @@ function PostForm({
     onSubmit,
     submitText,
     disabled = false
-}) {
+}: PostFormProps) {
     const fileInputId = useId()
     const fileErrorId = useId()
     const nextFileId = useRef(0)
     const submitting = useRef(false)
-    const [selectedFiles, setSelectedFiles] = useState([])
-    const [fileErrors, setFileErrors] = useState([])
+    const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([])
+    const [fileErrors, setFileErrors] = useState<string[]>([])
 
-    const selectFiles = event => {
+    const selectFiles = (event: ChangeEvent<HTMLInputElement>) => {
         const input = event.currentTarget
-        const additions = []
+        const additions: SelectedFile[] = []
         const rejected = []
-        for (const file of input.files) {
+        for (const file of input.files ?? []) {
             if (!acceptedFileTypes.includes(file.type)) {
                 rejected.push(`${file.name}: JPEG, PNG, WebP, PDF 파일만 첨부할 수 있습니다.`)
             } else if (file.size === 0) {
@@ -41,7 +63,7 @@ function PostForm({
         input.value = ''
     }
 
-    const submit = async event => {
+    const submit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
         if (disabled || submitting.current) return
         submitting.current = true

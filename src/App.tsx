@@ -7,7 +7,7 @@ function App() {
     <div>
       <Header />
       <AppRouter />
-    </div> 
+    </div>
   )
 }
 

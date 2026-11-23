@@ -147,6 +147,13 @@ npm run build
 npm run lint
 ```
 
+### 6. 타입 검사와 테스트
+
+```bash
+npm run typecheck
+npm test
+```
+
 ## 검증 방법
 
 - `npm run build`로 프로덕션 빌드가 통과하는지 확인합니다.
@@ -231,4 +238,4 @@ AI-DLC 작업은 공통 저장소를 연 Codex 세션에서 시작합니다. 공
 
 게시글 변경은 Bearer 인증과 multipart 요청을 사용하며, 현재 상세 응답의 `isAuthor === true`에서만 수정·삭제 수단을 표시합니다. 로그인 왕복 시 동일 계정으로 확인된 입력만 복원하고, 새로고침·탭 종료·명시적 로그아웃·다른 계정 로그인·성공한 제출에서는 입력을 폐기합니다.
 
-인증 자동 검증은 `node --test tests/auth-session.test.mjs`로 실행합니다. 빌드·린트와 모의 전송 기반 자동 검증은 실제 Backend 연동을 대신하지 않습니다. ASK-16의 실제 `isAuthor` 제공, 서버 인가, `Cache-Control: no-store` 및 Chrome 화면·Network·Console 검증은 아직 완료하지 않았습니다.
+인증 자동 검증은 `npm exec -- tsx --test tests/auth-session.test.mjs`로 실행합니다. `npm test`는 기존 인증·첨부 회귀 테스트를 함께 실행합니다. 빌드·린트와 모의 전송 기반 자동 검증은 실제 Backend 연동을 대신하지 않습니다. ASK-16의 실제 `isAuthor` 제공, 서버 인가, `Cache-Control: no-store` 및 Chrome 화면·Network·Console 검증은 아직 완료하지 않았습니다.
