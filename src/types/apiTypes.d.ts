@@ -8,9 +8,22 @@ export interface PostSummary {
     postId: number
     title: string
     writerNickname?: string
+    categoryName?: string
     newPost?: boolean
     likeCount: number
     createdAt?: string
+}
+
+export interface PostPage {
+    content: PostSummary[]
+    currentPage: number
+    pageSize: number
+    totalElements: number
+    totalPages: number
+    hasNext: boolean
+    hasPrevious: boolean
+    isFirst: boolean
+    isLast: boolean
 }
 
 export interface PostDetail {
