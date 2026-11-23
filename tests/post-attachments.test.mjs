@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import api from '../src/api/api.js'
-import { postFormData, resolvePostFileUrl } from '../src/api/postApi.js'
+import { postFormData, resolvePostFileUrl } from '../src/api/postApi.ts'
 
 const post = { categoryId: 1, title: '제목', content: '내용' }
 

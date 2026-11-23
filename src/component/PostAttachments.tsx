@@ -1,16 +1,17 @@
 import { useState } from 'react'
-import { resolvePostFileUrl } from '../api/postApi.js'
+import { resolvePostFileUrl } from '../api/postApi.ts'
+import type { PostAttachment } from '../types/apiTypes'
 import './PostAttachments.css'
 
 const imageTypes = ['image/jpeg', 'image/png', 'image/webp']
 
-function AttachmentImage({ url, label }) {
+function AttachmentImage({ url, label }: { url: string; label: string }) {
     const [failed, setFailed] = useState(false)
     if (failed) return <span>{label}을 표시할 수 없습니다.</span>
     return <img src={url} alt={label} loading="lazy" onError={() => setFailed(true)} />
 }
 
-function PostAttachments({ files = [], label = '첨부파일' }) {
+function PostAttachments({ files = [], label = '첨부파일' }: { files?: PostAttachment[]; label?: string }) {
     if (!files?.length) return null
 
     let pdfNumber = 0

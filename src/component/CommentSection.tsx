@@ -1,13 +1,21 @@
 import { useId, useState } from 'react'
 import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { createComment, deleteComment, getComments, setCommentLike, updateComment } from '../api/commentApi.js'
+import { createComment, deleteComment, getComments, setCommentLike, updateComment } from '../api/commentApi'
 import { commentKeys } from '../api/queryKeys.ts'
 import { authSession } from '../auth/authSession.js'
 import { errorMessage, SessionError } from '../auth/session.js'
-import CommentForm from './CommentForm.jsx'
-import CommentItem from './CommentItem.jsx'
+import CommentForm from './CommentForm'
+import CommentItem from './CommentItem'
+import type { AuthSnapshot } from '../auth/types'
+import type { CommentPage, CommentSort } from '../types/apiTypes'
 import './CommentSection.css'
+
+type CommentAction =
+    | { kind: 'create'; content: string }
+    | { kind: 'edit'; id: number; content: string }
+    | { kind: 'delete'; id: number }
+    | { kind: 'like'; id: number; liked: boolean }
 
 const failureMessages = {
     create: '댓글 작성에 실패했습니다.',
@@ -16,18 +24,18 @@ const failureMessages = {
     like: '댓글 좋아요 요청에 실패했습니다.'
 }
 
-function isWriter(auth, writerId) {
+function isWriter(auth: AuthSnapshot, writerId: number) {
     return auth.status === 'authenticated' &&
         typeof auth.userId === 'string' && /^[1-9]\d*$/.test(auth.userId) &&
         Number.isSafeInteger(writerId) && auth.userId === String(writerId)
 }
 
-function CommentSection({ postId, auth }) {
+function CommentSection({ postId, auth }: { postId: string; auth: AuthSnapshot }) {
     const headingId = useId()
     const queryClient = useQueryClient()
-    const [sort, setSort] = useState('latest')
+    const [sort, setSort] = useState<CommentSort>('latest')
     const [page, setPage] = useState(0)
-    const [editingId, setEditingId] = useState(null)
+    const [editingId, setEditingId] = useState<number | null>(null)
     const [showLogin, setShowLogin] = useState(false)
     const [message, setMessage] = useState('')
     const listKey = commentKeys.list(postId, auth.generation, sort, page)
@@ -51,7 +59,7 @@ function CommentSection({ postId, auth }) {
     const mutation = useMutation({
         mutationKey,
         networkMode: 'always',
-        mutationFn: action => {
+        mutationFn: (action: CommentAction) => {
             if (!authSession.isCurrent(auth.generation)) {
                 throw new SessionError('인증 상태가 변경되었습니다.', 'STALE')
             }
@@ -74,7 +82,7 @@ function CommentSection({ postId, auth }) {
         }
     })
 
-    const change = async action => {
+    const change = async (action: CommentAction) => {
         if (!authSession.isCurrent(auth.generation) || queryClient.isMutating(mutationFilter)) return false
         if (auth.status === 'anonymous') {
             setShowLogin(true)
@@ -93,13 +101,13 @@ function CommentSection({ postId, auth }) {
         return true
     }
 
-    const currentComment = id => {
-        const state = queryClient.getQueryState(listKey)
+    const currentComment = (id: number) => {
+        const state = queryClient.getQueryState<CommentPage>(listKey)
         if (state?.status !== 'success' || state.fetchStatus !== 'idle' || state.isInvalidated) return
-        return state.data.comments.find(comment => comment.commentId === id)
+        return state.data?.comments.find(comment => comment.commentId === id)
     }
 
-    const handleLike = (id, intended) => {
+    const handleLike = (id: number, intended?: boolean) => {
         if (auth.status === 'anonymous') {
             if (authSession.isCurrent(auth.generation)) setShowLogin(true)
             return
@@ -109,7 +117,7 @@ function CommentSection({ postId, auth }) {
         void change({ kind: 'like', id, liked: intended ?? !comment.likedByMe })
     }
 
-    const saveEdit = (id, content) => {
+    const saveEdit = (id: number, content: string) => {
         const comment = currentComment(id)
         return comment && isWriter(auth, comment.writerId)
             ? change({ kind: 'edit', id, content })
@@ -121,13 +129,13 @@ function CommentSection({ postId, auth }) {
         mutation.reset()
     }
 
-    const handleDelete = id => {
+    const handleDelete = (id: number) => {
         const comment = currentComment(id)
         if (!comment || !isWriter(auth, comment.writerId) || queryClient.isMutating(mutationFilter)) return
         if (window.confirm('댓글을 삭제하시겠습니까?')) void change({ kind: 'delete', id })
     }
 
-    const navigatePage = nextPage => {
+    const navigatePage = (nextPage: number) => {
         if (queryClient.isMutating(mutationFilter)) return
         setEditingId(null)
         mutation.reset()
@@ -135,7 +143,8 @@ function CommentSection({ postId, auth }) {
     }
 
     const failedAction = mutation.error ? mutation.variables : null
-    const failedLike = failedAction?.kind === 'like' ? currentComment(failedAction.id) : null
+    const failedLike = failedAction?.kind === 'like' ? failedAction : null
+    const failedLikeComment = failedLike && currentComment(failedLike.id)
     const busy = pending || list.isFetching
 
     return (
@@ -147,7 +156,7 @@ function CommentSection({ postId, auth }) {
                     <select value={sort} disabled={pending} onChange={event => {
                         if (queryClient.isMutating(mutationFilter)) return
                         navigatePage(0)
-                        setSort(event.target.value)
+                        setSort(event.target.value as CommentSort)
                     }}>
                         <option value="latest">최신순</option>
                         <option value="likeCount">좋아요순</option>
@@ -173,11 +182,11 @@ function CommentSection({ postId, auth }) {
             {failedAction && (
                 <div role="alert" className="comment-error">
                     <p>{errorMessage(mutation.error, failureMessages[failedAction.kind])}</p>
-                    {failedLike && (failedLike.likedByMe === failedAction.liked ? (
+                    {failedLike && failedLikeComment && (failedLikeComment.likedByMe === failedLike.liked ? (
                         <p>다시 조회한 좋아요 상태에 요청이 반영되어 있습니다.</p>
                     ) : (
                         <button type="button" disabled={busy}
-                            onClick={() => handleLike(failedAction.id, failedAction.liked)}>
+                            onClick={() => handleLike(failedLike.id, failedLike.liked)}>
                             좋아요 요청 다시 시도
                         </button>
                     ))}

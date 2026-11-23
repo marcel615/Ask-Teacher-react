@@ -61,7 +61,45 @@ export interface PostCreateRequest {
     files?: File[]
 }
 
+export interface PostCreateResult {
+    postId: number
+    title: string
+    newPost: boolean
+    createdAt: string
+}
+
 export type PostUpdateRequest = PostCreateRequest
+
+export interface PostUpdateResult {
+    postId: number
+    categoryId: number
+    title: string
+    content: string
+    updatedAt: string
+}
+
+export type CommentSort = 'latest' | 'likeCount'
+
+export interface PostComment {
+    commentId: number
+    writerId: number
+    writerNickname: string
+    content: string
+    likeCount: number
+    likedByMe: boolean
+    createdAt: string
+    updatedAt: string
+}
+
+export interface CommentPage {
+    comments: PostComment[]
+    page: number
+    size: number
+    totalElements: number
+    totalPages: number
+    hasNext: boolean
+    sort: CommentSort
+}
 
 export interface Category {
     id: number

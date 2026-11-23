@@ -6,15 +6,15 @@ import { authSession } from './auth/authSession.js'
 import { useAuth } from './auth/useAuth.js'
 import { SessionStatus } from './auth/AuthBoundary.jsx'
 import { errorMessage } from './auth/session.js'
-import CommentSection from './component/CommentSection.jsx'
-import PostAttachments from './component/PostAttachments.jsx'
-import PostLikeButton from './component/PostLikeButton.jsx'
+import CommentSection from './component/CommentSection'
+import PostAttachments from './component/PostAttachments'
+import PostLikeButton from './component/PostLikeButton'
 import './PostDetailPage.css'
 
-const formatDateTime = dateTime => dateTime ? dateTime.replace('T', ' ').slice(0, 16) : ''
+const formatDateTime = (dateTime?: string) => dateTime ? dateTime.replace('T', ' ').slice(0, 16) : ''
 
 function PostDetailPage() {
-    const { postId } = useParams()
+    const { postId = '' } = useParams()
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const auth = useAuth()

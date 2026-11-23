@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { useForm } from 'react-hook-form'
 import { useNavigate, useParams } from 'react-router-dom'
 import { getPost, updatePost } from './api/postApi'
@@ -7,11 +8,23 @@ import { categoryKeys, postKeys } from './api/queryKeys'
 import PostForm from './component/PostForm'
 import { authSession } from './auth/authSession.js'
 import { useAuth } from './auth/useAuth.js'
-import { usePostDraft } from './auth/usePostDraft.js'
+import { usePostDraft } from './auth/usePostDraft'
 import { errorMessage, SessionError } from './auth/session.js'
+import type { AuthSnapshot } from './auth/types'
+import type { Category, PostDetail, PostUpdateRequest } from './types/apiTypes'
+import type { PostFormValues } from './types/postForm'
 import './PostEditpage.css'
 
-function EditForm({ postId, post, categories, auth, checkingAuthor, authorCheckFailed }) {
+interface EditFormProps {
+    postId: string
+    post: PostDetail
+    categories: Category[]
+    auth: AuthSnapshot
+    checkingAuthor: boolean
+    authorCheckFailed: boolean
+}
+
+function EditForm({ postId, post, categories, auth, checkingAuthor, authorCheckFailed }: EditFormProps) {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const draftKey = `edit:${postId}`
@@ -21,7 +34,7 @@ function EditForm({ postId, post, categories, auth, checkingAuthor, authorCheckF
         handleSubmit,
         control,
         formState: { errors }
-    } = useForm({
+    } = useForm<PostFormValues>({
         defaultValues: authSession.readDraft(draftKey, auth.userId) || {
             categoryId: String(post.categoryId ?? selectedCategory?.id ?? ''),
             title: post.title ?? '',
@@ -30,7 +43,7 @@ function EditForm({ postId, post, categories, auth, checkingAuthor, authorCheckF
     })
     const { title = '', content = '' } = usePostDraft(draftKey, auth.userId, control)
     const updateMutation = useMutation({
-        mutationFn: async values => {
+        mutationFn: async (values: PostUpdateRequest) => {
             if (!authSession.isCurrent(auth.generation)) {
                 throw new SessionError('로그인 상태가 변경되었습니다.')
             }
@@ -43,7 +56,7 @@ function EditForm({ postId, post, categories, auth, checkingAuthor, authorCheckF
             if (authSession.isCurrent(generation)) navigate(`/posts/${postId}`)
         }
     })
-    const onSubmit = (values, files) =>
+    const onSubmit = (values: PostFormValues, files: File[]) =>
         updateMutation.mutateAsync({
             categoryId: Number(values.categoryId),
             title: values.title.trim(),
@@ -76,7 +89,7 @@ function EditForm({ postId, post, categories, auth, checkingAuthor, authorCheckF
 }
 
 function PostEditPage() {
-    const { postId } = useParams()
+    const { postId = '' } = useParams()
     const auth = useAuth()
     const postQuery = useQuery({
         queryKey: postKeys.detail(postId, auth.generation),
@@ -100,7 +113,7 @@ function PostEditPage() {
             <button type="button" onClick={retryQueries}>다시 시도</button>
         </div>
     )
-    const postStatus = postQuery.error?.response?.status
+    const postStatus = isAxiosError(postQuery.error) ? postQuery.error.response?.status : undefined
     if (!postQuery.data || !categoryQuery.data || postStatus === 403 || postStatus === 404) {
         return queryErrorMessage
     }

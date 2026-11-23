@@ -1,15 +1,26 @@
 import { useId } from 'react'
 import { useForm } from 'react-hook-form'
 
-function CommentForm({ initialContent = '', onSubmit, onCancel, disabled }) {
+interface CommentValues {
+    content: string
+}
+
+interface CommentFormProps {
+    initialContent?: string
+    onSubmit: (content: string) => boolean | Promise<boolean>
+    onCancel?: () => void
+    disabled: boolean
+}
+
+function CommentForm({ initialContent = '', onSubmit, onCancel, disabled }: CommentFormProps) {
     const contentId = useId()
     const errorId = `${contentId}-error`
-    const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    const { register, handleSubmit, reset, formState: { errors } } = useForm<CommentValues>({
         defaultValues: { content: initialContent }
     })
     const label = onCancel ? '댓글 수정' : '댓글 작성'
 
-    const submit = async ({ content }) => {
+    const submit = async ({ content }: CommentValues) => {
         const saved = await onSubmit(content)
         if (saved && !onCancel) reset()
     }

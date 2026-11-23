@@ -12,7 +12,7 @@ const Header = () => {
         mutationFn: () => authSession.logout(),
         onSuccess: () => navigate('/posts')
     })
-    
+
     return (
         <header className='header'>
             <Link to="/" className='header-title'>Ask Teacher</Link>

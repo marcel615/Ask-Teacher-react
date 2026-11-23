@@ -1,4 +1,19 @@
-import CommentForm from './CommentForm.jsx'
+import CommentForm from './CommentForm'
+import type { PostComment } from '../types/apiTypes'
+
+interface CommentItemProps {
+    comment: PostComment
+    liked: boolean
+    canManage: boolean
+    editing: boolean
+    anotherEditOpen: boolean
+    disabled: boolean
+    onLike: () => void
+    onEdit: () => void
+    onSave: (content: string) => boolean | Promise<boolean>
+    onCancel: () => void
+    onDelete: () => void
+}
 
 function CommentItem({
     comment,
@@ -12,7 +27,7 @@ function CommentItem({
     onSave,
     onCancel,
     onDelete
-}) {
+}: CommentItemProps) {
     return (
         <li>
             <div className="comment-meta">

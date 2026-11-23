@@ -1,6 +1,7 @@
 import { authSession } from '../auth/authSession.js'
+import type { CommentPage, CommentSort } from '../types/apiTypes'
 
-export async function getComments(postId, page, sort, signal) {
+export async function getComments(postId: string, page: number, sort: CommentSort, signal?: AbortSignal): Promise<CommentPage> {
     const response = await authSession.request({
         method: 'get',
         url: `/posts/${postId}/comments`,
@@ -10,7 +11,7 @@ export async function getComments(postId, page, sort, signal) {
     return response.data
 }
 
-export function createComment(postId, content) {
+export function createComment(postId: string, content: string) {
     return authSession.request({
         method: 'post',
         url: `/posts/${postId}/comments`,
@@ -18,7 +19,7 @@ export function createComment(postId, content) {
     })
 }
 
-export function updateComment(commentId, content) {
+export function updateComment(commentId: number, content: string) {
     return authSession.request({
         method: 'patch',
         url: `/comments/${commentId}`,
@@ -26,11 +27,11 @@ export function updateComment(commentId, content) {
     })
 }
 
-export function deleteComment(commentId) {
+export function deleteComment(commentId: number) {
     return authSession.request({ method: 'delete', url: `/comments/${commentId}` })
 }
 
-export function setCommentLike(commentId, liked) {
+export function setCommentLike(commentId: number, liked: boolean) {
     return authSession.request({
         method: liked ? 'post' : 'delete',
         url: `/comments/${commentId}/likes`

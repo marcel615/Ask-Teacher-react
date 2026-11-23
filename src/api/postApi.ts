@@ -1,19 +1,18 @@
 import api from './api.js'
 import { authSession } from '../auth/authSession.js'
 
-/**
- * @typedef {import('../types/apiTypes').PostCreateRequest} PostCreateRequest
- * @typedef {import('../types/apiTypes').PostUpdateRequest} PostUpdateRequest
- */
+import type {
+    PostCreateRequest,
+    PostCreateResult,
+    PostDetail,
+    PostListParams,
+    PostPage,
+    PostUpdateRequest,
+    PostUpdateResult,
+} from '../types/apiTypes'
 
-/**
- * @param {import('../types/apiTypes').PostListParams} [params]
- * @param {AbortSignal} [signal]
- * @returns {Promise<import('../types/apiTypes').PostPage>}
- */
-export const getPostPage = async (params, signal) => {
-    /** @type {import('axios').AxiosResponse<import('../types/apiTypes').PostPage>} */
-    const response = await api.get('/posts', { params, signal })
+export const getPostPage = async (params?: PostListParams, signal?: AbortSignal) => {
+    const response = await api.get<PostPage>('/posts', { params, signal })
     return response.data
 }
 
@@ -21,21 +20,23 @@ export const getPosts = async () => {
     return (await getPostPage()).content
 }
 
-export const getPost = async (postId, signal) => {
+export const getPost = async (postId: string, signal?: AbortSignal): Promise<PostDetail> => {
     const response = await authSession.request({ method: 'get', url: `/posts/${postId}`, signal }, { publicFallback: true })
     return response.data
 }
 
-export const postFormData = postData => {
+export const postFormData = (postData: PostCreateRequest) => {
     const form = new FormData()
-    for (const key of ['categoryId', 'title', 'content']) form.append(key, postData[key])
+    form.append('categoryId', String(postData.categoryId))
+    form.append('title', postData.title)
+    form.append('content', postData.content)
     for (const file of postData.files ?? []) form.append('files', file)
     return form
 }
 
-export const resolvePostFileUrl = fileUrl => {
+export const resolvePostFileUrl = (fileUrl: string | undefined) => {
     if (typeof fileUrl !== 'string' || !fileUrl.trim()) return null
-    const { origin, protocol } = new URL(api.defaults.baseURL)
+    const { origin, protocol } = new URL(api.defaults.baseURL ?? '')
     try {
         const url = new URL(fileUrl, origin)
         return url.origin === origin && url.protocol === protocol ? url.href : null
@@ -44,33 +45,25 @@ export const resolvePostFileUrl = fileUrl => {
     }
 }
 
-/**
- * @param {PostCreateRequest} postData
- */
-export const createPost = async (postData) => {
+export const createPost = async (postData: PostCreateRequest): Promise<PostCreateResult> => {
     const response = await authSession.request({ method: 'post', url: '/posts', data: postFormData(postData) })
     return response.data
 }
 
-/**
- * @param {string | number} postId
- * @param {PostUpdateRequest} postData
- */
-export const updatePost = async (postId, postData) => {
+export const updatePost = async (postId: string | number, postData: PostUpdateRequest): Promise<PostUpdateResult> => {
     const response = await authSession.request({ method: 'patch', url: `/posts/${postId}`, data: postFormData(postData) })
     return response.data
 }
 
-export const deletePost = async (postId) => {
+export const deletePost = async (postId: string | number) => {
     const response = await authSession.request({ method: 'delete', url: `/posts/${postId}` })
     return response.data
 }
 
-export const likePost = async postId => {
+export const likePost = async (postId: string | number) => {
     await authSession.request({ method: 'post', url: `/posts/${postId}/likes` })
 }
 
-export const unlikePost = async postId => {
+export const unlikePost = async (postId: string | number) => {
     await authSession.request({ method: 'delete', url: `/posts/${postId}/likes` })
 }
-

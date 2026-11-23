@@ -1,12 +1,22 @@
 import { useState } from 'react'
 import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { likePost, unlikePost } from '../api/postApi.js'
+import { likePost, unlikePost } from '../api/postApi.ts'
+import type { AuthSnapshot } from '../auth/types'
+import type { PostDetail } from '../types/apiTypes'
 import { postKeys } from '../api/queryKeys.ts'
 import { authSession } from '../auth/authSession.js'
 import { errorMessage } from '../auth/session.js'
 
-function PostLikeButton({ postId, auth, likeCount, likedByMe, isFetching }) {
+interface PostLikeButtonProps {
+    postId: string
+    auth: AuthSnapshot
+    likeCount: number
+    likedByMe: boolean
+    isFetching: boolean
+}
+
+function PostLikeButton({ postId, auth, likeCount, likedByMe, isFetching }: PostLikeButtonProps) {
     const queryClient = useQueryClient()
     const [showLogin, setShowLogin] = useState(false)
     const detailFilter = { queryKey: postKeys.detail(postId, auth.generation), exact: true }
@@ -15,7 +25,7 @@ function PostLikeButton({ postId, auth, likeCount, likedByMe, isFetching }) {
     const likeMutation = useMutation({
         mutationKey: mutationFilter.mutationKey,
         networkMode: 'always',
-        mutationFn: shouldLike => {
+        mutationFn: (shouldLike: boolean) => {
             if (!authSession.isCurrent(auth.generation)) {
                 throw new Error('인증 상태가 변경되었습니다.')
             }
@@ -45,7 +55,7 @@ function PostLikeButton({ postId, auth, likeCount, likedByMe, isFetching }) {
             return
         }
 
-        const detail = queryClient.getQueryState(detailFilter.queryKey)
+        const detail = queryClient.getQueryState<PostDetail>(detailFilter.queryKey)
         if (
             isFetching ||
             queryClient.isMutating(mutationFilter) ||

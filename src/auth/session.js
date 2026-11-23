@@ -26,6 +26,7 @@ export function tokenSubject(token) {
 }
 
 export function createSession({ transport, environment = () => window }) {
+    /** @type {import('./types').AuthSnapshot} */
     let state = { status: 'checking', accessToken: null, userId: null, generation: 0, message: '' }
     let revision = 0
     let restorePromise

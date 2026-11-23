@@ -7,11 +7,14 @@ import { categoryKeys, postKeys } from './api/queryKeys'
 import PostForm from './component/PostForm'
 import { authSession } from './auth/authSession.js'
 import { useAuth } from './auth/useAuth.js'
-import { usePostDraft } from './auth/usePostDraft.js'
+import { usePostDraft } from './auth/usePostDraft'
 import { errorMessage, SessionError } from './auth/session.js'
+import type { AuthSnapshot } from './auth/types'
+import type { PostCreateRequest } from './types/apiTypes'
+import type { PostFormValues } from './types/postForm'
 import './PostCreatePage.css'
 
-function CreateForm({ auth }) {
+function CreateForm({ auth }: { auth: AuthSnapshot }) {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const {
@@ -19,7 +22,7 @@ function CreateForm({ auth }) {
         handleSubmit,
         control,
         formState: { errors }
-    } = useForm({
+    } = useForm<PostFormValues>({
         defaultValues: authSession.readDraft('create', auth.userId) || {
             categoryId: '',
             title: '',
@@ -38,7 +41,7 @@ function CreateForm({ auth }) {
     })
 
     const createMutation = useMutation({
-        mutationFn: async values => {
+        mutationFn: async (values: PostCreateRequest) => {
             if (!authSession.isCurrent(auth.generation)) {
                 throw new SessionError('로그인 상태가 변경되었습니다.')
             }
@@ -55,7 +58,7 @@ function CreateForm({ auth }) {
     })
     const { title = '', content = '' } = usePostDraft('create', auth.userId, control)
 
-    const onSubmit = (values, files) =>
+    const onSubmit = (values: PostFormValues, files: File[]) =>
         createMutation.mutateAsync({
             categoryId: Number(values.categoryId),
             title: values.title.trim(),
