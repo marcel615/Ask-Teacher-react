@@ -1,5 +1,7 @@
 export const postKeys = {
     all: ['posts'],
+    lists: ['posts', 'list'],
+    list: (keyword, categoryId, page) => ['posts', 'list', keyword, categoryId, page],
     details: ['posts', 'detail'],
     detail: (postId, generation) => ['posts', 'detail', String(postId), generation]
 }

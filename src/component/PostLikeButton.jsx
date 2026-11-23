@@ -22,7 +22,7 @@ function PostLikeButton({ postId, auth, likeCount, likedByMe, isFetching }) {
             return shouldLike ? likePost(postId) : unlikePost(postId)
         },
         onSettled: async () => {
-            const listFilter = { queryKey: postKeys.all, exact: true }
+            const listFilter = { queryKey: postKeys.lists }
             const currentDetailFilter = () => ({
                 queryKey: postKeys.detail(postId, authSession.getSnapshot().generation),
                 exact: true

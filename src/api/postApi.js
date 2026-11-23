@@ -6,9 +6,18 @@ import { authSession } from '../auth/authSession.js'
  * @typedef {import('../types/apiTypes').PostUpdateRequest} PostUpdateRequest
  */
 
+/**
+ * @param {{keyword?: string, categoryId?: string, page?: number}} [params]
+ * @param {AbortSignal} [signal]
+ * @returns {Promise<import('../types/apiTypes').PostPage>}
+ */
+export const getPostPage = async (params, signal) => {
+    const response = await api.get('/posts', { params, signal })
+    return response.data
+}
+
 export const getPosts = async () => {
-    const response = await api.get('/posts')
-    return response.data.content
+    return (await getPostPage()).content
 }
 
 export const getPost = async (postId, signal) => {
