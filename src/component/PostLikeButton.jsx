@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useIsMutating, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { likePost, unlikePost } from '../api/postApi.js'
-import { postKeys } from '../api/queryKeys.js'
+import { postKeys } from '../api/queryKeys.ts'
 import { authSession } from '../auth/authSession.js'
 import { errorMessage } from '../auth/session.js'
 

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Navigate, useLocation } from 'react-router-dom'
 import { authSession } from './authSession.js'
 import { useAuth } from './useAuth.js'
-import { commentKeys, postKeys } from '../api/queryKeys.js'
+import { commentKeys, postKeys } from '../api/queryKeys.ts'
 
 export function AuthLifecycle({ children }) {
     const queryClient = useQueryClient()

@@ -7,11 +7,12 @@ import { authSession } from '../auth/authSession.js'
  */
 
 /**
- * @param {{keyword?: string, categoryId?: string, page?: number}} [params]
+ * @param {import('../types/apiTypes').PostListParams} [params]
  * @param {AbortSignal} [signal]
  * @returns {Promise<import('../types/apiTypes').PostPage>}
  */
 export const getPostPage = async (params, signal) => {
+    /** @type {import('axios').AxiosResponse<import('../types/apiTypes').PostPage>} */
     const response = await api.get('/posts', { params, signal })
     return response.data
 }

@@ -4,6 +4,13 @@ export interface ApiResponse<T = unknown> {
     data?: T
 }
 
+export interface PostListParams {
+    keyword?: string
+    categoryId?: string
+    page?: number
+    size?: number
+}
+
 export interface PostSummary {
     postId: number
     title: string

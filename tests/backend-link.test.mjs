@@ -13,7 +13,7 @@ import axios from 'axios'
 import api from '../src/api/api.js'
 import { signup, login } from '../src/api/authApi.js'
 import { createPost, getPost, getPosts, updatePost, deletePost, postFormData } from '../src/api/postApi.js'
-import { getCategories } from '../src/api/postCategoryApi.js'
+import { getCategories } from '../src/api/postCategoryApi.ts'
 import { authSession } from '../src/auth/authSession.js'
 import { createSession } from '../src/auth/session.js'
 
