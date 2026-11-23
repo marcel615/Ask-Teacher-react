@@ -1,0 +1,12 @@
+.post-attachments {
+    display: grid;
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+}
+
+.post-attachments img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
