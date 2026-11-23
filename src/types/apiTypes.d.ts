@@ -54,7 +54,7 @@ export interface PostCreateRequest {
     files?: File[]
 }
 
-export interface PostUpdateRequest extends PostCreateRequest {}
+export type PostUpdateRequest = PostCreateRequest
 
 export interface Category {
     id: number
