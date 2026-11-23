@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { login } from './api/authApi'
-import { errorMessage as getErrorMessage } from './auth/session.js'
+import { errorMessage as getErrorMessage } from './auth/session.ts'
+import type { LoginRequest } from './types/apiTypes'
 import './LoginPage.css'
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -10,11 +11,12 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 function LoginPage() {
     const navigate = useNavigate()
     const location = useLocation()
+    const state = location.state as { message?: string } | null
     const {
         register,
         handleSubmit,
         formState: { errors }
-    } = useForm({
+    } = useForm<LoginRequest>({
         defaultValues: {
             email: '',
             password: ''
@@ -29,7 +31,7 @@ function LoginPage() {
         }
     })
 
-    const onSubmit = values => {
+    const onSubmit = (values: LoginRequest) => {
         if (loginMutation.isPending) return
         loginMutation.mutate({
             email: values.email.trim(),
@@ -44,7 +46,7 @@ function LoginPage() {
 
     return (
         <div className="login-page">
-            {location.state?.message && <p role="status">{location.state.message}</p>}
+            {state?.message && <p role="status">{state.message}</p>}
             <form className="login-form" onSubmit={handleSubmit(onSubmit)} noValidate>
                 <label className="login-form-label" htmlFor="login-email">이메일</label>
                 <input

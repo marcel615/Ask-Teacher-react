@@ -1,5 +1,5 @@
-import api from './api.js'
-import { authSession } from '../auth/authSession.js'
+import api from './api.ts'
+import { authSession } from '../auth/authSession.ts'
 
 import type {
     PostCreateRequest,
@@ -21,7 +21,7 @@ export const getPosts = async () => {
 }
 
 export const getPost = async (postId: string, signal?: AbortSignal): Promise<PostDetail> => {
-    const response = await authSession.request({ method: 'get', url: `/posts/${postId}`, signal }, { publicFallback: true })
+    const response = await authSession.request<PostDetail>({ method: 'get', url: `/posts/${postId}`, signal }, { publicFallback: true })
     return response.data
 }
 
@@ -46,12 +46,12 @@ export const resolvePostFileUrl = (fileUrl: string | undefined) => {
 }
 
 export const createPost = async (postData: PostCreateRequest): Promise<PostCreateResult> => {
-    const response = await authSession.request({ method: 'post', url: '/posts', data: postFormData(postData) })
+    const response = await authSession.request<PostCreateResult>({ method: 'post', url: '/posts', data: postFormData(postData) })
     return response.data
 }
 
 export const updatePost = async (postId: string | number, postData: PostUpdateRequest): Promise<PostUpdateResult> => {
-    const response = await authSession.request({ method: 'patch', url: `/posts/${postId}`, data: postFormData(postData) })
+    const response = await authSession.request<PostUpdateResult>({ method: 'patch', url: `/posts/${postId}`, data: postFormData(postData) })
     return response.data
 }
 

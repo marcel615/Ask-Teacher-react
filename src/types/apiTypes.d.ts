@@ -82,6 +82,7 @@ export type CommentSort = 'latest' | 'likeCount'
 
 export interface PostComment {
     commentId: number
+    postId: number
     writerId: number
     writerNickname: string
     content: string
@@ -110,6 +111,12 @@ export interface SignupRequest {
     email: string
     password: string
     nickname: string
+}
+
+export interface SignupResult {
+    userId: number
+    nickname: string
+    email: string
 }
 
 export interface LoginRequest {

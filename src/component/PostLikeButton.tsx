@@ -5,8 +5,8 @@ import { likePost, unlikePost } from '../api/postApi.ts'
 import type { AuthSnapshot } from '../auth/types'
 import type { PostDetail } from '../types/apiTypes'
 import { postKeys } from '../api/queryKeys.ts'
-import { authSession } from '../auth/authSession.js'
-import { errorMessage } from '../auth/session.js'
+import { authSession } from '../auth/authSession.ts'
+import { errorMessage } from '../auth/session.ts'
 
 interface PostLikeButtonProps {
     postId: string

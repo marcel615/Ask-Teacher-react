@@ -1,11 +1,12 @@
 import { useEffect } from 'react'
+import type { ReactNode } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Navigate, useLocation } from 'react-router-dom'
-import { authSession } from './authSession.js'
-import { useAuth } from './useAuth.js'
+import { authSession } from './authSession.ts'
+import { useAuth } from './useAuth.ts'
 import { commentKeys, postKeys } from '../api/queryKeys.ts'
 
-export function AuthLifecycle({ children }) {
+export function AuthLifecycle({ children }: { children: ReactNode }) {
     const queryClient = useQueryClient()
     useEffect(() => {
         let previous = authSession.getSnapshot().generation
@@ -37,7 +38,7 @@ export function SessionStatus() {
     </div>
 }
 
-export function RequireAuth({ children }) {
+export function RequireAuth({ children }: { children: ReactNode }) {
     const auth = useAuth()
     const location = useLocation()
     if (auth.status === 'checking' || auth.status === 'error') return <SessionStatus />

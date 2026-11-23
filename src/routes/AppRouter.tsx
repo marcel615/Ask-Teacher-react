@@ -6,7 +6,7 @@ import PostEditPage from "../PostEditPage";
 import PostDetailPage from "../PostDetailPage";
 import LoginPage from "../LoginPage";
 import SignupPage from "../SignupPage";
-import { RequireAuth } from '../auth/AuthBoundary.jsx';
+import { RequireAuth } from '../auth/AuthBoundary.tsx';
 
 function AppRouter() {
     return (

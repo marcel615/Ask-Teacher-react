@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { createSession, tokenSubject, errorMessage } from '../src/auth/session.js'
+import { createSession, tokenSubject, errorMessage } from '../src/auth/session.ts'
 import { postFormData } from '../src/api/postApi.ts'
 import { postKeys } from '../src/api/queryKeys.ts'
 import { QueryClient } from '@tanstack/react-query'
@@ -256,7 +256,7 @@ test('missing coordination support stops automatic refresh without sending crede
 })
 
 test('API functions parse the official flat detail, page content and category array', async () => {
-    const { default: api } = await import('../src/api/api.js')
+    const { default: api } = await import('../src/api/api.ts')
     const { getPost, getPosts } = await import('../src/api/postApi.ts')
     const { getCategories } = await import('../src/api/postCategoryApi.ts')
     const originalAdapter = api.defaults.adapter

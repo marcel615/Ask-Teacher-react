@@ -1,21 +1,48 @@
+import type { AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { LoginRequest, LoginResponse } from '../types/apiTypes'
+import type { PostFormValues } from '../types/postForm'
+import type { AuthSnapshot } from './types'
+
+type Transport = <Data>(config: AxiosRequestConfig) => Promise<AxiosResponse<Data>>
+type CoordinationStatus = 'unknown' | 'login' | 'authenticated' | 'anonymous' | 'blocked'
+type CookieAction = 'login' | 'refresh' | 'logout'
+
+interface CoordinationRecord {
+    version: number
+    status: CoordinationStatus
+}
+
+interface CoordinationMessage extends CoordinationRecord {
+    accessToken?: string | null
+    tokenType?: string
+}
+
+interface SessionFailure extends Error {
+    code?: string
+    response?: { status?: number; data?: { message?: string } }
+}
+
 const COORDINATION_KEY = 'askteacher.auth.coordination.v1'
 const LOCK_NAME = 'askteacher.auth.cookies.v1'
 const CHANNEL_NAME = 'askteacher.auth.v1'
 
-export const errorMessage = (error, fallback) => {
+export const errorMessage = (cause: unknown, fallback: string) => {
+    const error = cause as SessionFailure | null
     if (error instanceof SessionError || error?.code === 'CSRF') return error.message
     return error?.response?.data?.message || fallback
 }
 
 export class SessionError extends Error {
-    constructor(message, code = 'SESSION_REQUIRED') {
+    code: string
+
+    constructor(message: string, code = 'SESSION_REQUIRED') {
         super(message)
         this.code = code
     }
 }
 
 // This unverified claim only separates in-memory drafts. The server decides authorization.
-export function tokenSubject(token) {
+export function tokenSubject(token: string) {
     try {
         const payload = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
         const subject = JSON.parse(atob(payload)).sub
@@ -25,30 +52,32 @@ export function tokenSubject(token) {
     }
 }
 
-export function createSession({ transport, environment = () => window }) {
-    /** @type {import('./types').AuthSnapshot} */
-    let state = { status: 'checking', accessToken: null, userId: null, generation: 0, message: '' }
+export function createSession({ transport, environment = () => window }: {
+    transport: Transport
+    environment?: () => Window & typeof globalThis
+}) {
+    let state: AuthSnapshot = { status: 'checking', accessToken: null, userId: null, generation: 0, message: '' }
     let revision = 0
-    let restorePromise
-    let channel
+    let restorePromise: Promise<AuthSnapshot | LoginResponse | null | undefined> | undefined
+    let channel: BroadcastChannel
     let initialized = false
     let coordinationFailed = false
     let explicitMutationPending = false
     let seenVersion = 0
-    const listeners = new Set()
-    const drafts = new Map()
+    const listeners = new Set<() => void>()
+    const drafts = new Map<string, { owner: string; values: Partial<PostFormValues> }>()
 
-    const emit = patch => {
+    const emit = (patch: Partial<AuthSnapshot>) => {
         state = { ...state, ...patch }
         listeners.forEach(listener => listener())
     }
-    const clearIdentity = (status, message = '', discardDrafts = false) => {
+    const clearIdentity = (status: AuthSnapshot['status'], message = '', discardDrafts = false) => {
         revision += 1
         if (discardDrafts) drafts.clear()
         emit({ status, accessToken: null, userId: null, generation: state.generation + 1, message })
     }
-    const readCoordination = () => JSON.parse(environment().localStorage.getItem(COORDINATION_KEY) || '{"version":0,"status":"unknown"}')
-    const publish = status => {
+    const readCoordination = (): CoordinationRecord => JSON.parse(environment().localStorage.getItem(COORDINATION_KEY) || '{"version":0,"status":"unknown"}')
+    const publish = (status: CoordinationStatus) => {
         try {
             const previous = readCoordination()
             const record = { version: previous.version + 1, status }
@@ -67,7 +96,7 @@ export function createSession({ transport, environment = () => window }) {
             throw new SessionError(state.message, 'COORDINATION')
         }
     }
-    const onRemoteChange = event => {
+    const onRemoteChange = (event?: MessageEvent<CoordinationMessage>) => {
         // The queued explicit action owns the next cookie change. A preceding
         // tab's refresh must not cancel a requested logout or account switch.
         if (explicitMutationPending) return
@@ -109,7 +138,7 @@ export function createSession({ transport, environment = () => window }) {
         })
         initialized = true
     }
-    const withCookieLock = async operation => {
+    const withCookieLock = async <Result>(operation: () => Promise<Result>) => {
         initialize()
         const controller = new AbortController()
         const timeout = setTimeout(() => controller.abort(), 8000)
@@ -128,11 +157,11 @@ export function createSession({ transport, environment = () => window }) {
         }
     }
     const getCsrf = async () => {
-        const response = await transport({ method: 'get', url: '/auth/csrf', withCredentials: true })
+        const response = await transport<{ token?: string }>({ method: 'get', url: '/auth/csrf', withCredentials: true })
         if (!response.data?.token) throw new SessionError('보안 토큰을 받지 못했습니다. 다시 시도해 주세요.', 'CSRF')
         return response.data.token
     }
-    const commitToken = (data, expectedRevision, forceNewGeneration = false) => {
+    const commitToken = (data: { accessToken?: string | null; tokenType?: string } | undefined, expectedRevision: number, forceNewGeneration = false) => {
         if (revision !== expectedRevision) throw new SessionError('인증 상태가 변경되었습니다. 다시 시도해 주세요.', 'STALE')
         if (!data?.accessToken || data.tokenType?.toLowerCase() !== 'bearer') {
             throw new SessionError('인증 응답을 확인할 수 없습니다. 다시 로그인해 주세요.', 'INVALID_TOKEN')
@@ -145,13 +174,13 @@ export function createSession({ transport, environment = () => window }) {
         emit({ status: 'authenticated', accessToken: data.accessToken, userId,
             generation: state.generation + Number(identityChanged), message: '' })
     }
-    const cookieRequest = async (kind, data, expectedRevision) => {
+    const cookieRequest = async (kind: CookieAction, data: LoginRequest | undefined, expectedRevision: number) => {
         let mutationSent = false
         try {
             const csrf = await getCsrf()
             if (revision !== expectedRevision) throw new SessionError('인증 상태가 변경되었습니다.', 'STALE')
             mutationSent = true
-            const response = await transport({
+            const response = await transport<LoginResponse | undefined>({
                 method: 'post', url: `/auth/${kind}`, data, withCredentials: true,
                 headers: { 'X-XSRF-TOKEN': csrf, ...(kind === 'logout' && state.accessToken ? { Authorization: `Bearer ${state.accessToken}` } : {}) }
             })
@@ -179,7 +208,8 @@ export function createSession({ transport, environment = () => window }) {
                 }
             }
             return response.data
-        } catch (error) {
+        } catch (cause) {
+            const error = cause as SessionFailure
             if (revision !== expectedRevision) {
                 // A queued explicit logout/account switch owns the current state.
                 // An uncertain rotation must still stop other tabs from refreshing,
@@ -225,26 +255,27 @@ export function createSession({ transport, environment = () => window }) {
             }
             if (state.status === 'error' && !manual) throw new SessionError(state.message, 'AUTH_UNAVAILABLE')
             return cookieRequest('refresh', undefined, expectedRevision)
-        }).catch(error => {
+        }).catch((error: SessionFailure) => {
             if (error.code === 'COORDINATION') clearIdentity('anonymous', error.message)
             throw error
         }).finally(() => { restorePromise = undefined })
         return restorePromise
     }
 
-    const request = async (config, { publicFallback = false } = {}) => {
+    const request = async <Data = unknown>(config: AxiosRequestConfig, { publicFallback = false } = {}): Promise<AxiosResponse<Data>> => {
         const generation = state.generation
         const token = state.accessToken
         const owner = state.userId
         if (!publicFallback && !token) throw new SessionError('로그인이 필요합니다. 다시 로그인해 주세요.')
-        const send = accessToken => transport({ ...config, headers: {
+        const send = (accessToken: string | null) => transport<Data>({ ...config, headers: {
             ...config.headers, ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
         } })
         try {
             const response = await send(token)
             if (generation !== state.generation) throw new SessionError('인증 상태가 변경되었습니다.', 'STALE')
             return response
-        } catch (error) {
+        } catch (cause) {
+            const error = cause as SessionFailure
             if (error.response?.status !== 401 || generation !== state.generation) throw error
             const alreadyRefreshed = state.status === 'authenticated' &&
                 state.accessToken !== token && state.userId === owner
@@ -264,7 +295,8 @@ export function createSession({ transport, environment = () => window }) {
                     const response = await send(state.accessToken)
                     if (currentGeneration !== state.generation) throw new SessionError('인증 상태가 변경되었습니다.', 'STALE')
                     return response
-                } catch (retryError) {
+                } catch (retryCause) {
+                    const retryError = retryCause as SessionFailure
                     if (retryError.response?.status !== 401 || currentGeneration !== state.generation) throw retryError
                     clearIdentity('anonymous', '로그인이 만료되었습니다. 다시 로그인해 주세요.')
                     if (!publicFallback) throw new SessionError('로그인이 만료되었습니다. 다시 로그인해 주세요.')
@@ -282,9 +314,12 @@ export function createSession({ transport, environment = () => window }) {
 
     return {
         getSnapshot: () => state,
-        subscribe: listener => { listeners.add(listener); return () => listeners.delete(listener) },
+        subscribe: (listener: () => void) => {
+            listeners.add(listener)
+            return () => { listeners.delete(listener) }
+        },
         restore,
-        login: data => {
+        login: (data: LoginRequest) => {
             explicitMutationPending = true
             clearIdentity('checking')
             const expectedRevision = revision
@@ -308,15 +343,15 @@ export function createSession({ transport, environment = () => window }) {
             }).finally(() => { explicitMutationPending = false })
         },
         request,
-        isCurrent: generation => state.generation === generation,
-        saveDraft: (key, values, owner) => {
+        isCurrent: (generation: number) => state.generation === generation,
+        saveDraft: (key: string, values: Partial<PostFormValues>, owner: string | null) => {
             if (owner) drafts.set(key, { owner, values: { ...values } })
         },
-        readDraft: (key, owner) => {
+        readDraft: (key: string, owner: string | null) => {
             const draft = drafts.get(key)
             if (!owner || draft?.owner !== owner) { drafts.delete(key); return null }
             return draft?.values || null
         },
-        clearDraft: key => drafts.delete(key)
+        clearDraft: (key: string) => drafts.delete(key)
     }
 }

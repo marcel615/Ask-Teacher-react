@@ -1,8 +1,8 @@
-import { authSession } from '../auth/authSession.js'
+import { authSession } from '../auth/authSession.ts'
 import type { CommentPage, CommentSort } from '../types/apiTypes'
 
 export async function getComments(postId: string, page: number, sort: CommentSort, signal?: AbortSignal): Promise<CommentPage> {
-    const response = await authSession.request({
+    const response = await authSession.request<CommentPage>({
         method: 'get',
         url: `/posts/${postId}/comments`,
         params: { page, sort },

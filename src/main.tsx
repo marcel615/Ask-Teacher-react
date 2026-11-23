@@ -4,7 +4,7 @@ import {BrowserRouter} from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './index.css'
 import App from './App'
-import { AuthLifecycle } from './auth/AuthBoundary.jsx'
+import { AuthLifecycle } from './auth/AuthBoundary.tsx'
 
 const queryClient = new QueryClient()
 

@@ -6,7 +6,6 @@
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "types": ["vite/client"],
-    "allowJs": true,
     "allowImportingTsExtensions": true,
     "strict": true,
     "isolatedModules": true,

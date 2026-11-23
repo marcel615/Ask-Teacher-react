@@ -1,9 +1,9 @@
 import './Header.css'
 import {Link, useNavigate } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { authSession } from '../auth/authSession.js'
-import { useAuth } from '../auth/useAuth.js'
-import { errorMessage } from '../auth/session.js'
+import { authSession } from '../auth/authSession.ts'
+import { useAuth } from '../auth/useAuth.ts'
+import { errorMessage } from '../auth/session.ts'
 
 const Header = () => {
     const navigate = useNavigate()
