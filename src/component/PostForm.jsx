@@ -1,4 +1,8 @@
+import { useId, useRef, useState } from 'react'
+import PostAttachments from './PostAttachments.jsx'
 import './PostForm.css'
+
+const acceptedFileTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf']
 
 function PostForm({
     categoryList = [],
@@ -6,12 +10,50 @@ function PostForm({
     errors = {},
     titleLength = 0,
     contentLength = 0,
+    savedFiles,
+    handleSubmit,
     onSubmit,
     submitText,
     disabled = false
 }) {
+    const fileInputId = useId()
+    const fileErrorId = useId()
+    const nextFileId = useRef(0)
+    const submitting = useRef(false)
+    const [selectedFiles, setSelectedFiles] = useState([])
+    const [fileErrors, setFileErrors] = useState([])
+
+    const selectFiles = event => {
+        const input = event.currentTarget
+        const additions = []
+        const rejected = []
+        for (const file of input.files) {
+            if (!acceptedFileTypes.includes(file.type)) {
+                rejected.push(`${file.name}: JPEG, PNG, WebP, PDF 파일만 첨부할 수 있습니다.`)
+            } else if (file.size === 0) {
+                rejected.push(`${file.name}: 빈 파일은 첨부할 수 없습니다.`)
+            } else {
+                additions.push({ id: nextFileId.current++, file })
+            }
+        }
+        setSelectedFiles(current => [...current, ...additions])
+        setFileErrors(rejected)
+        input.value = ''
+    }
+
+    const submit = async event => {
+        event.preventDefault()
+        if (disabled || submitting.current) return
+        submitting.current = true
+        try {
+            await handleSubmit(values => onSubmit(values, selectedFiles.map(({ file }) => file)))(event)
+        } finally {
+            submitting.current = false
+        }
+    }
+
     return (
-        <form className="post-form" onSubmit={onSubmit}>
+        <form className="post-form" onSubmit={submit}>
             <label className="post-form-label">카테고리</label>
             <select
                 className="post-form-select"
@@ -73,6 +115,39 @@ function PostForm({
             <p className={`post-form-count ${contentLength >= 5000 ? 'limit' : ''}`}>
                 {contentLength}/5000
             </p>
+            <PostAttachments files={savedFiles} label="저장된 첨부파일" />
+            <label className="post-form-label" htmlFor={fileInputId}>첨부파일</label>
+            <input
+                id={fileInputId}
+                type="file"
+                accept={acceptedFileTypes.join(',')}
+                multiple
+                disabled={disabled}
+                aria-describedby={fileErrors.length ? fileErrorId : undefined}
+                onChange={selectFiles}
+            />
+            {fileErrors.length > 0 && (
+                <ul className="post-form-error" id={fileErrorId} role="alert">
+                    {fileErrors.map((message, index) => <li key={index}>{message}</li>)}
+                </ul>
+            )}
+            {selectedFiles.length > 0 && (
+                <ul className="post-form-selected-files" aria-label="선택한 파일">
+                    {selectedFiles.map(({ id, file }) => (
+                        <li key={id}>
+                            <span>{file.name}</span>
+                            <button
+                                type="button"
+                                disabled={disabled}
+                                aria-label={`${file.name} 제거`}
+                                onClick={() => setSelectedFiles(current => current.filter(item => item.id !== id))}
+                            >
+                                제거
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
             <button className="post-form-button" type="submit" disabled={disabled}>
                 {submitText}
             </button>

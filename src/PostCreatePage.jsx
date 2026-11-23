@@ -8,13 +8,12 @@ import PostForm from './component/PostForm'
 import { authSession } from './auth/authSession.js'
 import { useAuth } from './auth/useAuth.js'
 import { usePostDraft } from './auth/usePostDraft.js'
-import { errorMessage } from './auth/session.js'
+import { errorMessage, SessionError } from './auth/session.js'
 import './PostCreatePage.css'
 
-function PostCreatePage() {
+function CreateForm({ auth }) {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const auth = useAuth()
     const {
         register,
         handleSubmit,
@@ -29,16 +28,22 @@ function PostCreatePage() {
     })
 
     const {
-        data: categoryList = [],
+        data: categoryList,
         isLoading: isCategoryLoading,
-        error: categoryError
+        error: categoryError,
+        refetch: refetchCategories
     } = useQuery({
         queryKey: categoryKeys.all,
         queryFn: getCategories
     })
 
     const createMutation = useMutation({
-        mutationFn: async values => ({ response: await createPost(values), generation: auth.generation }),
+        mutationFn: async values => {
+            if (!authSession.isCurrent(auth.generation)) {
+                throw new SessionError('로그인 상태가 변경되었습니다.')
+            }
+            return { response: await createPost(values), generation: auth.generation }
+        },
         onSuccess: async ({ generation }) => {
             if (!authSession.isCurrent(generation)) return
             authSession.clearDraft('create')
@@ -50,22 +55,18 @@ function PostCreatePage() {
     })
     const { title = '', content = '' } = usePostDraft('create', auth.userId, control)
 
-    const onSubmit = values => {
-        if (createMutation.isPending) return
-        createMutation.mutate({
+    const onSubmit = (values, files) =>
+        createMutation.mutateAsync({
             categoryId: Number(values.categoryId),
             title: values.title.trim(),
-            content: values.content.trim()
+            content: values.content.trim(),
+            files
+        }).catch(() => {
+            // The mutation error is displayed above the form.
         })
-    }
 
     if (isCategoryLoading) {
         return <div className="post-create-page">로딩 중...</div>
-    }
-
-    if (categoryError) {
-        const message = categoryError.response?.data?.message || '카테고리 목록을 불러오지 못했습니다.'
-        return <div className="post-create-page">{message}</div>
     }
 
     const mutationError =
@@ -74,21 +75,35 @@ function PostCreatePage() {
     return (
         <div className="post-create-page">
             <h3 className="post-create-title">Post Create Page</h3>
-            {mutationError && (
-                <p className="error-message">{mutationError}</p>
+            {categoryError && (
+                <div role="alert">
+                    <p>{errorMessage(categoryError, '카테고리 목록을 불러오지 못했습니다.')}</p>
+                    <button type="button" onClick={() => void refetchCategories()}>다시 시도</button>
+                </div>
             )}
-            <PostForm
-                categoryList={categoryList}
-                register={register}
-                errors={errors}
-                titleLength={title.length}
-                contentLength={content.length}
-                onSubmit={handleSubmit(onSubmit)}
-                submitText={createMutation.isPending ? '작성 중...' : '작성'}
-                disabled={createMutation.isPending}
-            />
+            {mutationError && (
+                <p className="error-message" role="alert">{mutationError}</p>
+            )}
+            {categoryList && (
+                <PostForm
+                    categoryList={categoryList}
+                    register={register}
+                    errors={errors}
+                    titleLength={title.length}
+                    contentLength={content.length}
+                    handleSubmit={handleSubmit}
+                    onSubmit={onSubmit}
+                    submitText={createMutation.isPending ? '작성 중...' : '작성'}
+                    disabled={createMutation.isPending}
+                />
+            )}
         </div>
     )
+}
+
+function PostCreatePage() {
+    const auth = useAuth()
+    return <CreateForm key={auth.generation} auth={auth} />
 }
 
 export default PostCreatePage

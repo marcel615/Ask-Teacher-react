@@ -26,6 +26,12 @@ export interface PostPage {
     isLast: boolean
 }
 
+export interface PostAttachment {
+    storedFileName: string
+    contentType: string
+    fileUrl: string
+}
+
 export interface PostDetail {
     postId: number
     id?: number
@@ -38,12 +44,14 @@ export interface PostDetail {
     likedByMe: boolean
     createdAt?: string
     updatedAt?: string
+    files?: PostAttachment[]
 }
 
 export interface PostCreateRequest {
     categoryId: number
     title: string
     content: string
+    files?: File[]
 }
 
 export interface PostUpdateRequest extends PostCreateRequest {}

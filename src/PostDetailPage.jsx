@@ -7,6 +7,7 @@ import { useAuth } from './auth/useAuth.js'
 import { SessionStatus } from './auth/AuthBoundary.jsx'
 import { errorMessage } from './auth/session.js'
 import CommentSection from './component/CommentSection.jsx'
+import PostAttachments from './component/PostAttachments.jsx'
 import PostLikeButton from './component/PostLikeButton.jsx'
 import './PostDetailPage.css'
 
@@ -60,6 +61,7 @@ function PostDetailPage() {
             </div>
             <h3 className="post-detail-title">{post.title}</h3>
             <p className="post-detail-content">{post.content}</p>
+            <PostAttachments key={postId} files={post.files} />
             <PostLikeButton
                 key={JSON.stringify(postKeys.detail(postId, auth.generation))}
                 postId={postId}

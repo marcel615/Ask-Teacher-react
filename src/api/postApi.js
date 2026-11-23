@@ -28,7 +28,19 @@ export const getPost = async (postId, signal) => {
 export const postFormData = postData => {
     const form = new FormData()
     for (const key of ['categoryId', 'title', 'content']) form.append(key, postData[key])
+    for (const file of postData.files ?? []) form.append('files', file)
     return form
+}
+
+export const resolvePostFileUrl = fileUrl => {
+    if (typeof fileUrl !== 'string' || !fileUrl.trim()) return null
+    const { origin, protocol } = new URL(api.defaults.baseURL)
+    try {
+        const url = new URL(fileUrl, origin)
+        return url.origin === origin && url.protocol === protocol ? url.href : null
+    } catch {
+        return null
+    }
 }
 
 /**
